@@ -7,6 +7,7 @@ import { AuthProvider } from "./hooks/use-auth";
 import { SessionProvider } from "./hooks/use-session";
 import { ProtectedRoute } from "./lib/protected-route";
 import DashboardPage from "./pages/dashboard-page";
+import TrackerPage from "./pages/tracker-page";
 import AuthPage from "./pages/auth-page";
 import HistoryPage from "./pages/history-page";
 import ReportsPage from "./pages/reports-page";
@@ -16,7 +17,7 @@ function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={DashboardPage} />
-      <ProtectedRoute path="/tracker" component={DashboardPage} />
+      <ProtectedRoute path="/tracker" component={TrackerPage} />
       <ProtectedRoute path="/history" component={HistoryPage} />
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />

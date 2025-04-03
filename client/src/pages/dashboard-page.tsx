@@ -1,68 +1,180 @@
-import { useState } from "react";
 import { Layout } from "@/components/layout";
-import { TimerPanel } from "@/components/timer-panel";
-import { SessionSummary } from "@/components/session-summary";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Link } from "wouter";
+import { 
+  Clock, 
+  Calendar, 
+  Sparkles, 
+  BarChart,
+  History, 
+  Settings,
+  ArrowRight
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
-import { useActivityTracker } from "@/hooks/use-activity-tracker";
-import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Calendar, Sparkles } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function DashboardPage() {
-  const { selectedSession, selectSession } = useSession();
+  const { user } = useAuth();
+  const { currentSession, activeSeconds, isActive } = useSession();
+  
+  // Helper function to format a date
+  const formatDate = (date: Date): string => {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  };
+  
+  // Helper function to format seconds
+  const formatDuration = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (hours === 0) {
+      return `${minutes} minutes`;
+    }
+    
+    return `${hours}h ${minutes}m`;
+  };
   
   return (
-    <Layout title="Time Tracker">
-      <TimerPanel />
-      
-      {/* Session Summary Modal */}
-      {selectedSession && (
-        <SessionSummary 
-          session={selectedSession} 
-          onClose={() => selectSession(null)} 
-        />
-      )}
-      
-      {/* Welcome Message */}
-      <Card className="border-2 border-primary/20 bg-primary/5 shadow-lg rounded-xl mt-8">
-        <CardContent className="p-8 flex flex-col items-center text-center">
-          <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
+    <Layout title="Dashboard">
+      {/* Welcome Banner */}
+      <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/10 to-primary/20 shadow-lg rounded-xl mb-8">
+        <CardContent className="p-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || 'User'}!</h1>
+              <p className="text-muted-foreground">
+                Today is {formatDate(new Date())}
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0">
+              {isActive ? (
+                <div className="bg-green-500/20 text-green-500 px-4 py-2 rounded-full border border-green-500/30 flex items-center">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-2"></div>
+                  <span className="font-medium">Currently Working</span>
+                </div>
+              ) : (
+                <Button asChild>
+                  <Link href="/tracker">
+                    <Clock className="mr-2 h-4 w-4" />
+                    Start Tracking
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
-          <h2 className="text-2xl font-bold mb-2">Welcome to Time Tracker!</h2>
-          <p className="text-muted-foreground max-w-md">
-            Track your productive time and boost your efficiency. Just click "Start Work" when you begin and "End Work" when you're done.
-          </p>
         </CardContent>
       </Card>
       
-      {/* Quick Tips */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <Card className="border-2 border-primary/20 bg-green-400/10 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
-          <CardContent className="p-6 flex items-start">
-            <div className="mr-4 h-10 w-10 rounded-full bg-green-400/20 flex items-center justify-center text-green-400">
-              <Clock className="h-5 w-5" />
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="border-2 border-primary/20 bg-primary/5 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-sm text-muted-foreground">Current Session</h3>
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-primary" />
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold mb-2">Focus on One Task</h3>
-              <p className="text-sm text-muted-foreground">
-                For maximum productivity, focus on a single task during each work session.
-              </p>
+            <div className="text-2xl font-bold">
+              {isActive ? formatDuration(activeSeconds) : 'Not tracking'}
+            </div>
+            {isActive && (
+              <div className="text-xs text-muted-foreground mt-1">
+                Started at {new Date(currentSession?.startTime || '').toLocaleTimeString()}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
+        <Card className="border-2 border-indigo-400/20 bg-indigo-400/5 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-sm text-muted-foreground">This Week</h3>
+              <div className="h-8 w-8 rounded-full bg-indigo-400/10 flex items-center justify-center">
+                <Calendar className="h-4 w-4 text-indigo-400" />
+              </div>
+            </div>
+            <div className="text-2xl font-bold">12h 45m</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              8 sessions total
             </div>
           </CardContent>
         </Card>
         
-        <Card className="border-2 border-primary/20 bg-amber-500/10 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
-          <CardContent className="p-6 flex items-start">
-            <div className="mr-4 h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
-              <Calendar className="h-5 w-5" />
+        <Card className="border-2 border-amber-500/20 bg-amber-500/5 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-sm text-muted-foreground">Average Daily</h3>
+              <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <BarChart className="h-4 w-4 text-amber-500" />
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold mb-2">Take Regular Breaks</h3>
-              <p className="text-sm text-muted-foreground">
-                Remember to take short breaks to stay refreshed and maintain high productivity.
-              </p>
+            <div className="text-2xl font-bold">4h 15m</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              +12% from last week
             </div>
           </CardContent>
+        </Card>
+      </div>
+      
+      {/* Feature Cards */}
+      <h2 className="text-xl font-bold mb-4">Quick Access</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+          <Link href="/tracker">
+            <CardContent className="p-6 flex flex-col cursor-pointer h-full">
+              <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Clock className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="mb-2">Time Tracker</CardTitle>
+              <p className="text-sm text-muted-foreground flex-grow mb-4">
+                Track your work sessions and monitor your productivity in real-time.
+              </p>
+              <div className="text-primary flex items-center text-sm font-medium">
+                Go to Tracker <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+        
+        <Card className="border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+          <Link href="/history">
+            <CardContent className="p-6 flex flex-col cursor-pointer h-full">
+              <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <History className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="mb-2">Session History</CardTitle>
+              <p className="text-sm text-muted-foreground flex-grow mb-4">
+                View your past work sessions and analyze your work patterns.
+              </p>
+              <div className="text-primary flex items-center text-sm font-medium">
+                View History <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+        
+        <Card className="border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+          <Link href="/settings">
+            <CardContent className="p-6 flex flex-col cursor-pointer h-full">
+              <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Settings className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="mb-2">Preferences</CardTitle>
+              <p className="text-sm text-muted-foreground flex-grow mb-4">
+                Customize your tracking settings and notification preferences.
+              </p>
+              <div className="text-primary flex items-center text-sm font-medium">
+                Change Settings <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
+            </CardContent>
+          </Link>
         </Card>
       </div>
     </Layout>
