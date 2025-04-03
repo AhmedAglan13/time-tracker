@@ -15,7 +15,7 @@ interface SessionContextType {
   isLoading: boolean;
   recentSessions: Session[];
   selectedSession: Session | null;
-  selectSession: (session: Session) => void;
+  selectSession: (session: Session | null) => void;
 }
 
 const SessionContext = createContext<SessionContextType | null>(null);

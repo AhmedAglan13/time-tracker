@@ -149,29 +149,7 @@ export function TimerPanel() {
           </div>
         </div>
         
-        {/* Activity Status */}
-        <div className="mt-6 p-5 bg-background/30 rounded-xl border border-primary/20 shadow-inner">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-md font-semibold flex items-center">
-              <Keyboard className="w-5 h-5 mr-2 text-primary" />
-              Keyboard Activity
-            </h4>
-            <Badge className={`${statusStyle.badge} px-3 py-1 text-sm font-medium`}>
-              {statusStyle.label}
-            </Badge>
-          </div>
-          
-          <div className="relative h-3 bg-background/50 rounded-full overflow-hidden border border-primary/20">
-            <div 
-              className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary/70 to-primary transition-all duration-500 ease-in-out" 
-              style={{ width: `${activityPercentage}%` }}
-            ></div>
-          </div>
-          <div className="mt-3 text-sm text-primary/70 flex items-center bg-background/30 p-2 rounded-lg border border-primary/10">
-            <AlertCircle className="w-4 h-4 mr-2 text-primary/50" />
-            <span>Tracking pauses after 5 minutes without keyboard activity</span>
-          </div>
-        </div>
+
       </div>
     </Card>
   );
