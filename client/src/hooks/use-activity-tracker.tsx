@@ -9,9 +9,22 @@ export function useActivityTracker() {
   const [idleTime, setIdleTime] = useState(0);
   const [activityLogs, setActivityLogs] = useState<{ timestamp: Date; message: string }[]>([]);
   
+  // Create refs to track state for timer callbacks
+  const isActiveRef = useRef(false);
+  const isIdleRef = useRef(false);
+  
   const timerRef = useRef<number | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
   const idleTimeoutRef = useRef<number | null>(null);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
+  
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
   
   // Log activity function
   const logActivity = useCallback((message: string) => {
@@ -23,13 +36,13 @@ export function useActivityTracker() {
   
   // Reset idle timer when keyboard activity is detected
   const resetIdleTimer = useCallback(() => {
-    if (!isActive) return;
+    if (!isActiveRef.current) return;
     
     const now = Date.now();
     lastActivityRef.current = now;
     
     // If we were idle, resume activity
-    if (isIdle) {
+    if (isIdleRef.current) {
       setIsIdle(false);
       logActivity('Activity resumed');
     }
@@ -45,18 +58,19 @@ export function useActivityTracker() {
       logActivity('Idle state detected - timer paused');
       setIdleTime(0);
     }, IDLE_THRESHOLD);
-  }, [isActive, isIdle, logActivity]);
+  }, [logActivity]);
   
-  // Update timer every second
+  // Update timer every second - Using refs to avoid dependency cycle
   const updateTimer = useCallback(() => {
-    if (isActive && !isIdle) {
+    // Use refs to check the current state
+    if (isActiveRef.current && !isIdleRef.current) {
       setActiveSeconds(prev => prev + 1);
     }
     
-    if (isIdle) {
+    if (isIdleRef.current) {
       setIdleTime(prev => prev + 1);
     }
-  }, [isActive, isIdle]);
+  }, []);
   
   // Start tracking
   const startTracking = useCallback(() => {
