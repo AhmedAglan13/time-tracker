@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Keyboard } from "lucide-react";
+import { Clock, Keyboard, Sparkles, Clock3 } from "lucide-react";
 
 // Login form schema
 const loginSchema = z.object({
@@ -69,59 +69,55 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
       {/* Hero Section */}
-      <div className="md:w-1/2 bg-muted/50 p-8 flex flex-col justify-center">
+      <div className="md:w-1/2 bg-primary/10 p-8 flex flex-col justify-center">
         <div className="max-w-md mx-auto">
           <div className="flex items-center mb-6">
-            <Keyboard className="h-8 w-8 text-primary mr-2" />
-            <h1 className="text-3xl font-bold">DevTime <span className="text-primary">Tracker</span></h1>
+            <Clock3 className="h-10 w-10 text-primary mr-3 animate-pulse" />
+            <h1 className="text-4xl font-bold">Time <span className="text-primary font-extrabold">Tracker</span></h1>
           </div>
           
-          <h2 className="text-2xl font-bold mb-4">Track Your Productive Time</h2>
-          <p className="text-muted-foreground mb-6">
-            DevTime Tracker is designed for developers and IT professionals to accurately measure active 
-            keyboard time, providing insights into your actual programming time.
-          </p>
+          <div className="bg-card rounded-xl p-6 shadow-lg border-2 border-primary/20 mb-8">
+            <div className="flex justify-center mb-4">
+              <Sparkles className="h-12 w-12 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-center mb-2">Track Your Time, Boost Productivity!</h2>
+            <div className="flex justify-center mt-4">
+              <Button variant="outline" className="rounded-full px-6 border-2 border-primary/30 hover:bg-primary/20">
+                Learn More
+              </Button>
+            </div>
+          </div>
           
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">1</div>
-              <div>
-                <h3 className="font-semibold">Sign In When You Start Working</h3>
-                <p className="text-sm text-muted-foreground">Begin your tracking session with a single click</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-card p-4 rounded-lg shadow-md border border-primary/20 hover:border-primary/50 transition-all duration-300">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 text-primary mx-auto mb-2">
+                <Keyboard className="h-6 w-6" />
               </div>
+              <h3 className="font-semibold text-center">Track Activity</h3>
             </div>
             
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">2</div>
-              <div>
-                <h3 className="font-semibold">Automatic Activity Tracking</h3>
-                <p className="text-sm text-muted-foreground">We only count time when you're actively typing</p>
+            <div className="bg-card p-4 rounded-lg shadow-md border border-primary/20 hover:border-primary/50 transition-all duration-300">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 text-primary mx-auto mb-2">
+                <Clock className="h-6 w-6" />
               </div>
-            </div>
-            
-            <div className="flex items-start">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">3</div>
-              <div>
-                <h3 className="font-semibold">Get Session Summaries</h3>
-                <p className="text-sm text-muted-foreground">See detailed breakdowns of your work sessions</p>
-              </div>
+              <h3 className="font-semibold text-center">Save Time</h3>
             </div>
           </div>
         </div>
       </div>
       
       {/* Auth Forms */}
-      <div className="md:w-1/2 p-8 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Welcome to DevTime Tracker</CardTitle>
+      <div className="md:w-1/2 p-8 flex items-center justify-center bg-gradient-to-br from-background to-background/80">
+        <Card className="w-full max-w-md border-2 border-primary/20 shadow-xl">
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-2xl">Welcome! 👋</CardTitle>
             <CardDescription>
-              Sign in or create an account to start tracking your productive time
+              Sign in or create a new account
             </CardDescription>
           </CardHeader>
           
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid grid-cols-2 mb-4 mx-6">
+            <TabsList className="grid grid-cols-2 mb-4 mx-8">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
@@ -137,7 +133,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Username</FormLabel>
                           <FormControl>
-                            <Input placeholder="username" {...field} />
+                            <Input placeholder="username" className="border-primary/20" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -151,7 +147,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <Input type="password" placeholder="••••••••" className="border-primary/20" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -160,7 +156,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full" 
+                      className="w-full font-semibold text-md rounded-lg" 
                       disabled={loginMutation.isPending}
                     >
                       {loginMutation.isPending ? "Signing in..." : "Sign In"}
@@ -181,7 +177,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Smith" {...field} />
+                            <Input placeholder="John Smith" className="border-primary/20" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -195,7 +191,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Username</FormLabel>
                           <FormControl>
-                            <Input placeholder="johnsmith" {...field} />
+                            <Input placeholder="johnsmith" className="border-primary/20" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -209,7 +205,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <Input type="password" placeholder="••••••••" className="border-primary/20" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -223,7 +219,7 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Role (Optional)</FormLabel>
                           <FormControl>
-                            <Input placeholder="DevOps Engineer" {...field} />
+                            <Input placeholder="DevOps Engineer" className="border-primary/20" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -232,7 +228,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full" 
+                      className="w-full font-semibold text-md rounded-lg" 
                       disabled={registerMutation.isPending}
                     >
                       {registerMutation.isPending ? "Creating account..." : "Create Account"}
@@ -243,9 +239,9 @@ export default function AuthPage() {
             </TabsContent>
           </Tabs>
           
-          <CardFooter className="flex justify-center border-t border-border pt-4">
-            <p className="text-xs text-muted-foreground text-center">
-              By continuing, you agree to our Terms of Service and Privacy Policy
+          <CardFooter className="flex justify-center pt-2 pb-4">
+            <p className="text-xs text-primary/70 text-center font-medium">
+              Start tracking your time today! ✨
             </p>
           </CardFooter>
         </Card>

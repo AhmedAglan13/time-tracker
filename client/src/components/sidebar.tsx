@@ -56,9 +56,9 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       <div className="p-5 border-b border-border">
         <div className="flex items-center space-x-3">
           <div className="text-primary text-xl">
-            <Keyboard className="h-6 w-6" />
+            <Clock className="h-6 w-6 animate-pulse" />
           </div>
-          <h1 className="text-xl font-bold">DevTime <span className="text-primary">Tracker</span></h1>
+          <h1 className="text-xl font-bold">Time <span className="text-primary font-extrabold">Tracker</span></h1>
         </div>
       </div>
       
@@ -119,8 +119,8 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
         <Separator className="my-4" />
         
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>Version 1.0.2</span>
-          <span>© 2023</span>
+          <span>Version 1.1.0</span>
+          <span>© {new Date().getFullYear()}</span>
         </div>
       </div>
     </aside>
