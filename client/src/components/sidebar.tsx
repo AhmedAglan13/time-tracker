@@ -82,10 +82,11 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
             const isActive = location === link.href;
             return (
               <li key={link.id}>
+                {/* Use Link without nested <a> tags to avoid DOM nesting warnings */}
                 <Link href={link.href}>
-                  <a
+                  <div
                     className={cn(
-                      "flex items-center p-2 rounded-md transition-colors",
+                      "flex items-center p-2 rounded-md transition-colors cursor-pointer",
                       isActive 
                         ? "bg-primary/10 text-primary font-medium" 
                         : "text-foreground hover:bg-accent/50"
@@ -96,7 +97,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
                   >
                     {link.icon}
                     {link.label}
-                  </a>
+                  </div>
                 </Link>
               </li>
             );
