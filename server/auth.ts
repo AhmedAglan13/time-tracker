@@ -32,12 +32,13 @@ export function setupAuth(app: Express) {
   const sessionSecret = process.env.SESSION_SECRET || "dev-time-tracker-secret";
   const sessionSettings: expressSession.SessionOptions = {
     secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     store: storage.sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: 'lax'
     }
   };
 
