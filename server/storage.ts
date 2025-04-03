@@ -9,13 +9,20 @@ import {
   type ActivityLog,
   type InsertActivityLog
 } from "@shared/schema";
+import { db } from "./database";
+import { eq, desc } from "drizzle-orm";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { Pool } from "@neondatabase/serverless";
 
-const MemoryStore = createMemoryStore(session);
+// Create a connection pool for the session store
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-// modify the interface with any CRUD methods
-// you might need
+const PostgresSessionStore = connectPg(session);
+
+// Interface remains the same
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -37,92 +44,84 @@ export interface IStorage {
   sessionStore: session.SessionStore;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private sessions: Map<number, Session>;
-  private activityLogs: Map<number, ActivityLog>;
+// Implementation using PostgreSQL
+export class DatabaseStorage implements IStorage {
   sessionStore: session.SessionStore;
   
-  userCurrentId: number;
-  sessionCurrentId: number;
-  activityLogCurrentId: number;
-
   constructor() {
-    this.users = new Map();
-    this.sessions = new Map();
-    this.activityLogs = new Map();
-    this.userCurrentId = 1;
-    this.sessionCurrentId = 1;
-    this.activityLogCurrentId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
     });
   }
-
+  
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
   }
-
+  
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await db.select().from(users).where(eq(users.username, username));
+    return result[0];
   }
-
+  
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+    const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
   }
   
   // Session methods
   async getSession(id: number): Promise<Session | undefined> {
-    return this.sessions.get(id);
+    const result = await db.select().from(sessions).where(eq(sessions.id, id));
+    return result[0];
   }
   
   async getSessionsByUserId(userId: number): Promise<Session[]> {
-    return Array.from(this.sessions.values()).filter(
-      (session) => session.userId === userId,
-    );
+    return await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.userId, userId))
+      .orderBy(desc(sessions.startTime));
   }
   
   async createSession(insertSession: InsertSession): Promise<Session> {
-    const id = this.sessionCurrentId++;
-    const session: Session = { ...insertSession, id };
-    this.sessions.set(id, session);
-    return session;
+    const result = await db.insert(sessions).values(insertSession).returning();
+    return result[0];
   }
   
   async updateSession(id: number, sessionUpdate: Partial<Session>): Promise<Session> {
-    const session = this.sessions.get(id);
-    if (!session) {
+    const result = await db
+      .update(sessions)
+      .set(sessionUpdate)
+      .where(eq(sessions.id, id))
+      .returning();
+    
+    if (result.length === 0) {
       throw new Error(`Session with id ${id} not found`);
     }
     
-    const updatedSession = { ...session, ...sessionUpdate };
-    this.sessions.set(id, updatedSession);
-    return updatedSession;
+    return result[0];
   }
   
   // Activity log methods
   async getActivityLog(id: number): Promise<ActivityLog | undefined> {
-    return this.activityLogs.get(id);
+    const result = await db.select().from(activityLogs).where(eq(activityLogs.id, id));
+    return result[0];
   }
   
   async getActivityLogsBySessionId(sessionId: number): Promise<ActivityLog[]> {
-    return Array.from(this.activityLogs.values()).filter(
-      (activityLog) => activityLog.sessionId === sessionId,
-    );
+    return await db
+      .select()
+      .from(activityLogs)
+      .where(eq(activityLogs.sessionId, sessionId))
+      .orderBy(activityLogs.timestamp);
   }
   
   async createActivityLog(insertActivityLog: InsertActivityLog): Promise<ActivityLog> {
-    const id = this.activityLogCurrentId++;
-    const activityLog: ActivityLog = { ...insertActivityLog, id };
-    this.activityLogs.set(id, activityLog);
-    return activityLog;
+    const result = await db.insert(activityLogs).values(insertActivityLog).returning();
+    return result[0];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
