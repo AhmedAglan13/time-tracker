@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
-import session from "express-session";
+import expressSession from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
@@ -30,7 +30,7 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   const sessionSecret = process.env.SESSION_SECRET || "dev-time-tracker-secret";
-  const sessionSettings: session.SessionOptions = {
+  const sessionSettings: expressSession.SessionOptions = {
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
@@ -42,7 +42,7 @@ export function setupAuth(app: Express) {
   };
 
   app.set("trust proxy", 1);
-  app.use(session(sessionSettings));
+  app.use(expressSession(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());
 

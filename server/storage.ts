@@ -9,18 +9,12 @@ import {
   type ActivityLog,
   type InsertActivityLog
 } from "@shared/schema";
-import { db } from "./database";
+import { db, pool } from "./db";
 import { eq, desc } from "drizzle-orm";
-import session from "express-session";
+import expressSession from "express-session";
 import connectPg from "connect-pg-simple";
-import { Pool } from "@neondatabase/serverless";
 
-// Create a connection pool for the session store
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const PostgresSessionStore = connectPg(session);
+const PostgresSessionStore = connectPg(expressSession);
 
 // Interface remains the same
 export interface IStorage {
@@ -41,12 +35,12 @@ export interface IStorage {
   createActivityLog(activityLog: InsertActivityLog): Promise<ActivityLog>;
   
   // Session store for authentication
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 // Implementation using PostgreSQL
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: any;
   
   constructor() {
     this.sessionStore = new PostgresSessionStore({ 
