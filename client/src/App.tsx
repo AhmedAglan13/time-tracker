@@ -14,7 +14,10 @@ function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={DashboardPage} />
+      <ProtectedRoute path="/tracker" component={DashboardPage} /> {/* Reusing Dashboard for now */}
       <ProtectedRoute path="/history" component={HistoryPage} />
+      <ProtectedRoute path="/reports" component={NotFound} /> {/* Placeholder for future Reports page */}
+      <ProtectedRoute path="/settings" component={NotFound} /> {/* Placeholder for future Settings page */}
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

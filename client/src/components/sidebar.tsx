@@ -39,11 +39,11 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   };
   
   const links = [
-    { href: "/", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
-    { href: "/", label: "Time Tracker", icon: <Clock className="w-5 h-5 mr-3" /> },
-    { href: "/history", label: "History", icon: <History className="w-5 h-5 mr-3" /> },
-    { href: "/reports", label: "Reports", icon: <BarChart className="w-5 h-5 mr-3" /> },
-    { href: "/settings", label: "Settings", icon: <Settings className="w-5 h-5 mr-3" /> }
+    { id: "dashboard", href: "/", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
+    { id: "tracker", href: "/tracker", label: "Time Tracker", icon: <Clock className="w-5 h-5 mr-3" /> },
+    { id: "history", href: "/history", label: "History", icon: <History className="w-5 h-5 mr-3" /> },
+    { id: "reports", href: "/reports", label: "Reports", icon: <BarChart className="w-5 h-5 mr-3" /> },
+    { id: "settings", href: "/settings", label: "Settings", icon: <Settings className="w-5 h-5 mr-3" /> }
   ];
   
   const sidebarClasses = cn(
@@ -81,7 +81,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
           {links.map((link) => {
             const isActive = location === link.href;
             return (
-              <li key={link.href}>
+              <li key={link.id}>
                 <Link href={link.href}>
                   <a
                     className={cn(
