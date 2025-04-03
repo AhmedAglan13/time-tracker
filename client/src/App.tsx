@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "./hooks/use-auth";
 import { SessionProvider } from "./hooks/use-session";
+import { TimeThemeProvider } from "./components/time-theme-provider";
 import { ProtectedRoute } from "./lib/protected-route";
 import DashboardPage from "./pages/dashboard-page";
 import TrackerPage from "./pages/tracker-page";
@@ -32,8 +33,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SessionProvider>
-          <Router />
-          <Toaster />
+          <TimeThemeProvider>
+            <Router />
+            <Toaster />
+          </TimeThemeProvider>
         </SessionProvider>
       </AuthProvider>
     </QueryClientProvider>

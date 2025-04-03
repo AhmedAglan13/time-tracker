@@ -13,10 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { useAuth } from "@/hooks/use-auth";
+import { useTimeTheme } from "@/components/time-theme-provider";
+import { cn } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { currentSession, activeSeconds, isActive } = useSession();
+  const { getGreeting, timePeriod, colorScheme, getPeriodIcon } = useTimeTheme();
   
   // Helper function to format a date
   const formatDate = (date: Date): string => {
@@ -40,14 +43,35 @@ export default function DashboardPage() {
     return `${hours}h ${minutes}m`;
   };
   
+  // Get gradient based on time of day
+  const getTimeBasedGradient = () => {
+    switch(timePeriod) {
+      case 'morning': 
+        return 'bg-gradient-to-r from-amber-200/20 to-purple-200/30';
+      case 'afternoon': 
+        return 'bg-gradient-to-r from-orange-200/20 to-purple-200/30';
+      case 'evening': 
+        return 'bg-gradient-to-r from-pink-200/20 to-purple-300/30';
+      case 'night': 
+        return 'bg-gradient-to-r from-indigo-900/30 to-purple-800/30';
+      default: 
+        return 'bg-gradient-to-r from-primary/10 to-primary/20';
+    }
+  };
+  
   return (
     <Layout title="Dashboard">
       {/* Welcome Banner */}
-      <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/10 to-primary/20 shadow-lg rounded-xl mb-8">
+      <Card className={cn(
+        "border-2 border-primary/20 shadow-lg rounded-xl mb-8",
+        getTimeBasedGradient()
+      )}>
         <CardContent className="p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || 'User'}!</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                {getGreeting()}, {user?.username || 'User'}! {getPeriodIcon()}
+              </h1>
               <p className="text-muted-foreground">
                 Today is {formatDate(new Date())}
               </p>
@@ -73,7 +97,10 @@ export default function DashboardPage() {
       
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="border-2 border-primary/20 bg-primary/5 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
+          timePeriod === 'night' ? 'bg-primary/10' : 'bg-primary/5'
+        )}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium text-sm text-muted-foreground">Current Session</h3>
@@ -92,7 +119,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
-        <Card className="border-2 border-indigo-400/20 bg-indigo-400/5 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
+        <Card className={cn(
+          "border-2 border-indigo-400/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
+          timePeriod === 'night' ? 'bg-indigo-400/10' : 'bg-indigo-400/5'
+        )}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium text-sm text-muted-foreground">This Week</h3>
@@ -107,7 +137,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
-        <Card className="border-2 border-amber-500/20 bg-amber-500/5 shadow-md rounded-xl hover:shadow-lg transition-all duration-300">
+        <Card className={cn(
+          "border-2 border-amber-500/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
+          timePeriod === 'night' ? 'bg-amber-500/10' : 'bg-amber-500/5'
+        )}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium text-sm text-muted-foreground">Average Daily</h3>
@@ -126,10 +159,16 @@ export default function DashboardPage() {
       {/* Feature Cards */}
       <h2 className="text-xl font-bold mb-4">Quick Access</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
           <Link href="/tracker">
             <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-              <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className={cn(
+                "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
+                timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
+              )}>
                 <Clock className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="mb-2">Time Tracker</CardTitle>
@@ -143,10 +182,16 @@ export default function DashboardPage() {
           </Link>
         </Card>
         
-        <Card className="border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
           <Link href="/history">
             <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-              <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className={cn(
+                "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
+                timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
+              )}>
                 <History className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="mb-2">Session History</CardTitle>
@@ -160,10 +205,16 @@ export default function DashboardPage() {
           </Link>
         </Card>
         
-        <Card className="border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
           <Link href="/settings">
             <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-              <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className={cn(
+                "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
+                timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
+              )}>
                 <Settings className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="mb-2">Preferences</CardTitle>
