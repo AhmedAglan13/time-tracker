@@ -171,8 +171,13 @@ export default function ReportsPage() {
   
   // Prepare data for daily working hours chart
   const getDailyWorkingHoursData = () => {
+    interface DayData {
+      name: string;
+      hours: number;
+    }
+    
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const dayStats = days.map(day => ({ name: day, hours: 0 }));
+    const dayStats: DayData[] = days.map(day => ({ name: day, hours: 0 }));
     
     filteredSessions.forEach(session => {
       const date = new Date(session.startTime);
@@ -189,8 +194,15 @@ export default function ReportsPage() {
     const { startDate, endDate } = getDateRange(timeRange);
     const dayCount = differenceInDays(endDate, startDate) + 1;
     
+    // Define the type for chart entries
+    interface ChartEntry {
+      name: string;
+      active: number;
+      idle: number;
+    }
+    
     // Create entries for each day/week depending on the range
-    const entries = [];
+    const entries: ChartEntry[] = [];
     const isWeekly = dayCount > 31; // Use weeks for longer periods
     
     if (isWeekly) {

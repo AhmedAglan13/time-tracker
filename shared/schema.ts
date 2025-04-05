@@ -2,12 +2,28 @@ import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Define user roles for type safety
+export const UserRoles = {
+  ADMIN: 'admin',
+  MANAGER: 'manager',
+  USER: 'user'
+} as const;
+
+export type UserRole = typeof UserRoles[keyof typeof UserRoles];
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
-  role: text("role"),
+  role: text("role").default(UserRoles.USER),
+  // Fields below are not in the existing database table yet
+  // Used only for type definitions until we can safely migrate
+  // email: text("email"),
+  // department: text("department"),
+  // isActive: boolean("is_active").default(true),
+  // lastLogin: timestamp("last_login"),
+  // createdAt: timestamp("created_at").defaultNow()
 });
 
 export const sessions = pgTable("sessions", {
@@ -57,7 +73,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   name: true,
-  role: true,
+  role: true
 });
 
 export const insertSessionSchema = createInsertSchema(sessions).pick({

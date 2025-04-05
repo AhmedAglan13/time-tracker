@@ -16,24 +16,30 @@ import {
   type InsertDailyGoal
 } from "@shared/schema";
 import { db, pool } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql, count, sum, and, isNotNull } from "drizzle-orm";
 import expressSession from "express-session";
 import connectPg from "connect-pg-simple";
 
 const PostgresSessionStore = connectPg(expressSession);
 
-// Interface remains the same
+// Updated interface with admin methods
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<User>): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+  getUserCount(): Promise<number>;
+  getActiveUsersCount(): Promise<number>;
   
   // Session methods
   getSession(id: number): Promise<Session | undefined>;
   getSessionsByUserId(userId: number): Promise<Session[]>;
   createSession(session: InsertSession): Promise<Session>;
   updateSession(id: number, session: Partial<Session>): Promise<Session>;
+  getSessionCount(): Promise<number>;
+  getTotalActiveDuration(): Promise<number>;
   
   // Activity log methods
   getActivityLog(id: number): Promise<ActivityLog | undefined>;
@@ -77,7 +83,14 @@ export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     console.log(`Getting user by id: ${id}`);
     try {
-      const result = await db.select().from(users).where(eq(users.id, id));
+      const result = await db.select({
+        id: users.id,
+        username: users.username,
+        password: users.password,
+        name: users.name,
+        role: users.role
+      }).from(users).where(eq(users.id, id));
+      
       if (result.length > 0) {
         console.log(`Found user with id ${id}: ${result[0].username}`);
       } else {
@@ -93,7 +106,14 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     console.log(`Getting user by username: ${username}`);
     try {
-      const result = await db.select().from(users).where(eq(users.username, username));
+      const result = await db.select({
+        id: users.id,
+        username: users.username,
+        password: users.password,
+        name: users.name,
+        role: users.role
+      }).from(users).where(eq(users.username, username));
+      
       if (result.length > 0) {
         console.log(`Found user with username ${username}`);
       } else {
@@ -114,6 +134,77 @@ export class DatabaseStorage implements IStorage {
       return result[0];
     } catch (error) {
       console.error(`Error creating user ${insertUser.username}:`, error);
+      throw error;
+    }
+  }
+  
+  async updateUser(id: number, userUpdate: Partial<User>): Promise<User> {
+    console.log(`Updating user with id: ${id}`);
+    try {
+      const result = await db
+        .update(users)
+        .set(userUpdate)
+        .where(eq(users.id, id))
+        .returning();
+      
+      if (result.length === 0) {
+        throw new Error(`User with id ${id} not found`);
+      }
+      
+      console.log(`User updated: ${result[0].username}`);
+      return result[0];
+    } catch (error) {
+      console.error(`Error updating user with id ${id}:`, error);
+      throw error;
+    }
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    console.log('Getting all users');
+    try {
+      const result = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          password: users.password,
+          name: users.name,
+          role: users.role
+        })
+        .from(users)
+        .orderBy(users.username);
+      
+      console.log(`Found ${result.length} users`);
+      return result;
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      throw error;
+    }
+  }
+  
+  async getUserCount(): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: count() })
+        .from(users);
+      
+      return result[0].count || 0;
+    } catch (error) {
+      console.error('Error getting user count:', error);
+      throw error;
+    }
+  }
+  
+  async getActiveUsersCount(): Promise<number> {
+    try {
+      // Since we don't have lastLogin column yet, just return all users
+      // Later when we have the lastLogin column we can filter by recent logins
+      const result = await db
+        .select({ count: count() })
+        .from(users);
+      
+      return result[0].count || 0;
+    } catch (error) {
+      console.error('Error getting active users count:', error);
       throw error;
     }
   }
@@ -149,6 +240,38 @@ export class DatabaseStorage implements IStorage {
     }
     
     return result[0];
+  }
+  
+  async getSessionCount(): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: count() })
+        .from(sessions);
+      
+      return result[0].count || 0;
+    } catch (error) {
+      console.error('Error getting session count:', error);
+      throw error;
+    }
+  }
+  
+  async getTotalActiveDuration(): Promise<number> {
+    try {
+      // Sum up all active durations from completed sessions
+      const result = await db
+        .select({
+          total: sum(sessions.activeDuration)
+        })
+        .from(sessions)
+        .where(isNotNull(sessions.endTime));
+      
+      // Safely handle null value from sum() and convert to number
+      const totalDuration = result[0].total;
+      return totalDuration === null ? 0 : Number(totalDuration);
+    } catch (error) {
+      console.error('Error getting total active duration:', error);
+      throw error;
+    }
   }
   
   // Activity log methods

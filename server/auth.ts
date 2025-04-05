@@ -91,7 +91,7 @@ async function createTestAccount() {
       username: "testuser",
       password: await hashPassword("testpass"),
       name: "Test User",
-      role: "Tester"
+      role: "admin"
     });
     
     console.log("Test account created:", user.username);
