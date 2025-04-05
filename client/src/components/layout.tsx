@@ -20,19 +20,19 @@ export function Layout({ children, title = "Dashboard" }: LayoutProps) {
       
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="bg-muted/50 border-b border-border h-16 flex items-center justify-between px-4">
+        <header className="bg-primary/5 border-b border-primary/10 h-16 flex items-center justify-between px-4">
           <div className="flex items-center">
             {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="icon"
-              className="mr-4 md:hidden"
+              className="mr-4 md:hidden text-secondary hover:text-primary hover:bg-primary/10"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
               aria-label="Menu"
             >
               <Menu className="h-6 w-6" />
             </Button>
-            <h2 className="text-lg font-medium">{title}</h2>
+            <h2 className="text-lg font-medium text-secondary">{title}</h2>
           </div>
         </header>
         

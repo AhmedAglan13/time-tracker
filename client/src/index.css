@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --secondary: #044C7E;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -9,5 +13,26 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-secondary {
+    background-color: var(--secondary);
+  }
+  .text-secondary {
+    color: var(--secondary);
+  }
+  .border-secondary {
+    border-color: var(--secondary);
+  }
+  .hover\:bg-secondary:hover {
+    background-color: var(--secondary);
+  }
+  .hover\:text-secondary:hover {
+    color: var(--secondary);
+  }
+  .hover\:border-secondary:hover {
+    border-color: var(--secondary);
   }
 }
