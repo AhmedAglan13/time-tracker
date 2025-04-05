@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout";
 import { SessionSummary } from "@/components/session-summary";
+import { RecentSessions } from "@/components/recent-sessions";
 import { useSession } from "@/hooks/use-session";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -46,33 +47,33 @@ export default function HistoryPage() {
         />
       )}
       
-      {/* Empty State */}
-      <Card className="mt-6 text-center p-8 border-2 border-primary/20 bg-primary/5 rounded-xl shadow-lg">
-        <CardContent className="p-6 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-            <History className="h-8 w-8 text-primary" />
-          </div>
-          <CardTitle className="text-xl mb-3">Session History Coming Soon!</CardTitle>
-          <p className="text-muted-foreground max-w-md mx-auto mb-6">
-            We're working on enhancing your Time Tracker experience with detailed session history. Check back soon!
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 max-w-3xl mx-auto">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-background/50 border border-primary/10 shadow-sm">
-                <CardContent className="p-4 flex items-center">
-                  <div className="mr-3 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Clock className="h-4 w-4 text-primary/60" />
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-medium">Example Session</div>
-                    <div className="text-xs text-muted-foreground">{format(new Date(), "MMMM d, yyyy")}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Sessions List */}
+      <div className="mt-6">
+        {/* Import RecentSessions component to display sessions */}
+        <Card className="border-2 border-primary/20 rounded-xl shadow-lg overflow-hidden">
+          <CardHeader className="bg-primary/5 border-b border-primary/10">
+            <CardTitle>Session History</CardTitle>
+          </CardHeader>
+          {useSession().recentSessions.length === 0 ? (
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4 mx-auto">
+                <History className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">No sessions recorded yet</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Start tracking your work to create session history.
+              </p>
+            </CardContent>
+          ) : (
+            <CardContent className="p-0">
+              <RecentSessions 
+                sessions={useSession().recentSessions} 
+                onViewSession={selectSession} 
+              />
+            </CardContent>
+          )}
+        </Card>
+      </div>
     </Layout>
   );
 }
