@@ -72,48 +72,26 @@ export default function TrackerPage() {
         </CardContent>
       </Card>
       
-      {/* Quick Tips */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <Card className={cn(
-          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-          timePeriod === 'night' ? 'bg-green-400/15' : 'bg-green-400/10'
-        )}>
-          <CardContent className="p-6 flex items-start">
-            <div className={cn(
-              "mr-4 h-10 w-10 rounded-full flex items-center justify-center text-green-400",
-              timePeriod === 'night' ? 'bg-green-400/30' : 'bg-green-400/20'
-            )}>
-              <Clock className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="font-bold mb-2">Time Blocking</h3>
-              <p className="text-sm text-muted-foreground">
-                Allocate specific time blocks for focused work on single tasks to maximize efficiency.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className={cn(
-          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-          timePeriod === 'night' ? 'bg-amber-500/15' : 'bg-amber-500/10'
-        )}>
-          <CardContent className="p-6 flex items-start">
-            <div className={cn(
-              "mr-4 h-10 w-10 rounded-full flex items-center justify-center text-amber-500",
-              timePeriod === 'night' ? 'bg-amber-500/30' : 'bg-amber-500/20'
-            )}>
-              <Calendar className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="font-bold mb-2">Track Daily Goals</h3>
-              <p className="text-sm text-muted-foreground">
-                Set and track 2-3 specific goals for each work session to stay focused and motivated.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Productivity Tips Card */}
+      <Card className={cn(
+        "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 mt-8",
+        timePeriod === 'night' ? 'bg-blue-500/15' : 'bg-blue-500/10'
+      )}>
+        <CardContent className="p-6 flex items-start">
+          <div className={cn(
+            "mr-4 h-10 w-10 rounded-full flex items-center justify-center text-blue-500",
+            timePeriod === 'night' ? 'bg-blue-500/30' : 'bg-blue-500/20'
+          )}>
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold mb-2">Productivity Tips</h3>
+            <p className="text-sm text-muted-foreground">
+              Take regular breaks every 45-60 minutes and maintain a consistent work schedule to stay productive throughout the day.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </Layout>
   );
 }
