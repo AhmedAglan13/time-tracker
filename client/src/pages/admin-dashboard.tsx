@@ -100,7 +100,7 @@ export default function AdminDashboard() {
           "cursor-pointer hover:shadow-md transition-all border-2 border-indigo-500/10 hover:border-indigo-500/30",
           timePeriod === 'night' ? 'hover:bg-indigo-500/5' : ''
         )}>
-          <Link href="/history">
+          <Link href="/dashboard">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Sessions</CardTitle>
             </CardHeader>
