@@ -13,6 +13,7 @@ import AuthPage from "./pages/auth-page";
 import HistoryPage from "./pages/history-page";
 import ReportsPage from "./pages/reports-page";
 import SettingsPage from "./pages/settings-page";
+import AdminDashboard from "./pages/admin-dashboard";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <ProtectedRoute path="/history" component={HistoryPage} />
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
+      <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

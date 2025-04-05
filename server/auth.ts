@@ -92,6 +92,11 @@ async function createTestAccount() {
       });
       console.log("Admin account created:", adminUser.username);
     } else {
+      // Update existing user to ensure it has admin role
+      if (existingAdmin.role !== "admin") {
+        await storage.updateUser(existingAdmin.id, { role: "admin" });
+        console.log("Updated user to admin role:", existingAdmin.username);
+      }
       console.log("Admin account already exists");
     }
     

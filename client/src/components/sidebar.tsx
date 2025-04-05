@@ -8,9 +8,9 @@ import {
   BarChart,
   Settings,
   LogOut,
-  Keyboard,
-  CalendarRange,
-  CheckSquare
+  Shield,
+  Users,
+  BadgeHelp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,13 +40,24 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       .substring(0, 2);
   };
   
-  const links = [
+  // Define default links for all users
+  const defaultLinks = [
     { id: "dashboard", href: "/", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
     { id: "tracker", href: "/tracker", label: "Time Tracker", icon: <Clock className="w-5 h-5 mr-3" /> },
     { id: "history", href: "/history", label: "History", icon: <History className="w-5 h-5 mr-3" /> },
     { id: "reports", href: "/reports", label: "Reports", icon: <BarChart className="w-5 h-5 mr-3" /> },
     { id: "settings", href: "/settings", label: "Settings", icon: <Settings className="w-5 h-5 mr-3" /> }
   ];
+  
+  // Define admin-only links
+  const adminLinks = [
+    { id: "admin", href: "/admin", label: "Admin Dashboard", icon: <Shield className="w-5 h-5 mr-3" /> }
+  ];
+  
+  // Combine links based on user role
+  const links = user?.role?.toLowerCase() === 'admin' 
+    ? [...defaultLinks, ...adminLinks]
+    : defaultLinks;
   
   const sidebarClasses = cn(
     "flex flex-col h-screen bg-muted/50 border-r border-border transition-all duration-300",
