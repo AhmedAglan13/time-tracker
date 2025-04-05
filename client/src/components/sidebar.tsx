@@ -62,7 +62,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const links = user?.role?.toLowerCase() === 'admin' ? adminLinks : userLinks;
   
   const sidebarClasses = cn(
-    "flex flex-col h-screen bg-secondary border-r border-border transition-all duration-300 text-white",
+    "flex flex-col h-screen bg-[#044C7E] border-r border-border transition-all duration-300 text-white",
     isMobileOpen ? "fixed inset-y-0 left-0 z-50 w-64" : "hidden md:flex w-64"
   );
   

@@ -52,15 +52,15 @@ export default function DashboardPage() {
   const getTimeBasedGradient = () => {
     switch(timePeriod) {
       case 'morning': 
-        return 'bg-gradient-to-r from-amber-200/20 to-purple-200/30';
+        return 'bg-gradient-to-r from-primary/20 to-secondary/30';
       case 'afternoon': 
-        return 'bg-gradient-to-r from-orange-200/20 to-purple-200/30';
+        return 'bg-gradient-to-r from-primary/30 to-secondary/40';
       case 'evening': 
-        return 'bg-gradient-to-r from-pink-200/20 to-purple-300/30';
+        return 'bg-gradient-to-r from-primary/40 to-secondary/50';
       case 'night': 
-        return 'bg-gradient-to-r from-indigo-900/30 to-purple-800/30';
+        return 'bg-gradient-to-r from-secondary/50 to-secondary/30';
       default: 
-        return 'bg-gradient-to-r from-primary/10 to-primary/20';
+        return 'fawry-gradient bg-opacity-20';
     }
   };
   

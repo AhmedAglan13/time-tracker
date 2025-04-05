@@ -3,7 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --secondary: #044C7E;
+  --primary: #FF6243;    /* Coral/Orange */
+  --primary-hover: #FF7E65;
+  --secondary: #044C7E;  /* Deep Blue */
+  --secondary-hover: #0A5E96;
+  --accent: #6366F1;     /* Indigo */
+  --muted: #1F2937;      /* Dark Gray */
+  --muted-foreground: #9CA3AF;
+  --background: #121212; /* Almost Black */
+  --foreground: #F9FAFB; /* White */
+  --card: #1A1A1A;       /* Dark Gray for cards */
+  --card-hover: #222222;
 }
 
 @layer base {
@@ -13,6 +23,14 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+  
+  .card-gradient {
+    background: linear-gradient(120deg, var(--secondary) 0%, var(--secondary-hover) 100%);
   }
 }
 
@@ -34,5 +52,21 @@
   }
   .hover\:border-secondary:hover {
     border-color: var(--secondary);
+  }
+  
+  .btn-fawry {
+    @apply bg-primary text-white hover:bg-primary-hover transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-secondary-hover transition-colors;
+  }
+  
+  .card-fawry {
+    @apply border-primary/20 bg-card shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .fawry-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary;
   }
 }
