@@ -2,10 +2,10 @@ import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "@/hooks/use-session";
 import { useAuth } from "@/hooks/use-auth";
-import { Clock, Calendar, Download, BarChart, LineChart } from "lucide-react";
+import { Clock, Calendar, Download, BarChart, LineChart, Users } from "lucide-react";
 import { format, subDays, startOfWeek, endOfWeek, differenceInDays, isWithinInterval } from "date-fns";
 import { useState, useEffect } from "react";
-import { Session } from "@shared/schema";
+import { Session, User } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import {
   BarChart as RechartsBarChart,
   Bar
 } from "recharts";
+import { useQuery } from "@tanstack/react-query";
 
 type TimeRange = 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'all_time';
 
@@ -44,6 +45,21 @@ export default function ReportsPage() {
   const { toast } = useToast();
   const [timeRange, setTimeRange] = useState<TimeRange>('this_week');
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  
+  // For admin users, fetch all users
+  const isAdmin = user?.role?.toLowerCase() === "admin";
+  
+  const { data: allUsers = [] } = useQuery<User[]>({
+    queryKey: ["/api/admin/users"],
+    enabled: isAdmin,
+  });
+  
+  // Fetch sessions for selected user (admin only)
+  const { data: userSessions = [] } = useQuery<Session[]>({
+    queryKey: ["/api/admin/users", selectedUserId, "sessions"],
+    enabled: isAdmin && selectedUserId !== null,
+  });
   
   // Format time as hours and minutes
   const formatTime = (seconds: number) => {
@@ -85,17 +101,22 @@ export default function ReportsPage() {
     return { startDate, endDate };
   };
   
-  // Filter sessions based on the selected time range
+  // Filter sessions based on the selected time range and user
   useEffect(() => {
     const { startDate, endDate } = getDateRange(timeRange);
     
-    const filtered = recentSessions.filter(session => {
+    // Determine which sessions to use based on user role and selection
+    const sessionsToFilter = isAdmin && selectedUserId 
+      ? userSessions
+      : recentSessions;
+    
+    const filtered = sessionsToFilter.filter(session => {
       const sessionDate = new Date(session.startTime);
       return isWithinInterval(sessionDate, { start: startDate, end: endDate });
     });
     
     setFilteredSessions(filtered);
-  }, [recentSessions, timeRange]);
+  }, [recentSessions, userSessions, timeRange, selectedUserId, isAdmin]);
   
   // Calculate total active time in seconds
   const totalActiveTime = filteredSessions.reduce((total, session) => {
@@ -333,10 +354,36 @@ export default function ReportsPage() {
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-1">Reports & Analytics</h1>
-          <p className="text-muted-foreground">View insights and statistics about your work sessions.</p>
+          <p className="text-muted-foreground">
+            {isAdmin 
+              ? selectedUserId 
+                ? `Viewing reports for ${allUsers.find(u => u.id === selectedUserId)?.name || 'selected user'}`
+                : "View organization-wide analytics or select a specific user" 
+              : "View insights and statistics about your work sessions."
+            }
+          </p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {isAdmin && (
+            <Select
+              value={selectedUserId?.toString() || ""}
+              onValueChange={(value) => setSelectedUserId(value ? parseInt(value) : null)}
+            >
+              <SelectTrigger className="min-w-[180px] border-primary/20 bg-primary/5">
+                <SelectValue placeholder="Select User" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Users</SelectItem>
+                {allUsers.map(user => (
+                  <SelectItem key={user.id} value={user.id.toString()}>
+                    {user.name} ({user.role})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          
           <Select
             value={timeRange}
             onValueChange={(value: TimeRange) => setTimeRange(value)}
@@ -363,6 +410,23 @@ export default function ReportsPage() {
           </Button>
         </div>
       </div>
+      
+      {/* Admin view indicator */}
+      {isAdmin && selectedUserId && (
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-6 flex items-center gap-2">
+          <Users className="h-5 w-5 text-primary" />
+          <span>
+            Viewing reports for <strong>{allUsers.find(u => u.id === selectedUserId)?.name}</strong>
+          </span>
+          <Button 
+            variant="link" 
+            onClick={() => setSelectedUserId(null)}
+            className="ml-auto text-primary p-0 h-auto"
+          >
+            View All Users
+          </Button>
+        </div>
+      )}
       
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -287,6 +287,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+  
+  // Update user by admin
+  app.patch("/api/admin/users/:userId", isAdmin, async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    try {
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Create a schema for role validation
+      const roleSchema = z.object({
+        role: z.enum(["user", "admin"])
+      });
+
+      // Extract and validate the role
+      const { role } = roleSchema.parse(req.body);
+      
+      const updatedUser = await storage.updateUser(userId, { role });
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      if (error instanceof SyntaxError) {
+        return res.status(400).json({ message: "Invalid JSON in request body" });
+      }
+      res.status(400).json({ message: "Invalid role data. Role must be 'user' or 'admin'." });
+    }
+  });
+  
+  // Reset password for a user (admin only)
+  app.patch("/api/admin/users/:userId/password", isAdmin, async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    try {
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const passwordSchema = z.object({
+        password: z.string().min(6)
+      });
+
+      const { password } = passwordSchema.parse(req.body);
+      
+      // In a real app, we'd hash the password here before storing
+      const updatedUser = await storage.updateUser(userId, { password });
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(400).json({ message: "Invalid password data" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
