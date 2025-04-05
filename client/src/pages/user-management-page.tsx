@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Loader2, Clock, Shield, UserIcon, 
+  Loader2, Clock, Shield, UserIcon, Key,
   UserPlus, Trash2, UserCheck, UserX, Edit, MoreHorizontal 
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -43,6 +43,17 @@ const updateRoleSchema = z.object({
 type CreateUserFormValues = z.infer<typeof createUserSchema>;
 type UpdateRoleFormValues = z.infer<typeof updateRoleSchema>;
 
+// Reset password schema
+const resetPasswordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters")
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
+});
+
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+
 export default function UserManagementPage() {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -51,8 +62,10 @@ export default function UserManagementPage() {
   const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
   const [showUpdateRoleDialog, setShowUpdateRoleDialog] = useState(false);
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(null);
+  const [selectedUsername, setSelectedUsername] = useState<string | null>(null);
   
   const {
     data: users,
@@ -88,6 +101,15 @@ export default function UserManagementPage() {
     resolver: zodResolver(updateRoleSchema),
     defaultValues: {
       role: "user"
+    }
+  });
+  
+  // Reset password form
+  const resetPasswordForm = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: ""
     }
   });
 
@@ -161,6 +183,30 @@ export default function UserManagementPage() {
       });
     }
   });
+  
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: number; password: string }) => {
+      const res = await apiRequest("PATCH", `/api/admin/users/${userId}/password`, { password });
+      return res.ok;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setShowResetPasswordDialog(false);
+      resetPasswordForm.reset();
+      toast({
+        title: "Success",
+        description: "User password has been reset successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error resetting password",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
 
   // Create user handler
   const onCreateUserSubmit = (data: CreateUserFormValues) => {
@@ -179,6 +225,21 @@ export default function UserManagementPage() {
     if (selectedUserId) {
       deleteUserMutation.mutate(selectedUserId);
     }
+  };
+  
+  // Reset password handler
+  const onResetPasswordSubmit = (data: ResetPasswordFormValues) => {
+    if (selectedUserId) {
+      resetPasswordMutation.mutate({ userId: selectedUserId, password: data.password });
+    }
+  };
+  
+  // Open reset password dialog
+  const openResetPasswordDialog = (userId: number, username: string) => {
+    setSelectedUserId(userId);
+    setSelectedUsername(username);
+    setShowResetPasswordDialog(true);
+    resetPasswordForm.reset();
   };
 
   // Open update role dialog
@@ -318,6 +379,14 @@ export default function UserManagementPage() {
                             >
                               <Edit className="h-3.5 w-3.5 mr-2" />
                               Change Role
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => userData.id && userData.username && 
+                                openResetPasswordDialog(userData.id, userData.username)
+                              }
+                            >
+                              <Key className="h-3.5 w-3.5 mr-2" />
+                              Reset Password
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
@@ -583,6 +652,64 @@ export default function UserManagementPage() {
               )}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Reset Password Dialog */}
+      <Dialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Reset password for user "{selectedUsername}".
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...resetPasswordForm}>
+            <form onSubmit={resetPasswordForm.handleSubmit(onResetPasswordSubmit)} className="space-y-4">
+              <FormField
+                control={resetPasswordForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter new password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={resetPasswordForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Confirm new password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button 
+                  type="submit" 
+                  disabled={resetPasswordMutation.isPending}
+                  className="w-full mt-4"
+                >
+                  {resetPasswordMutation.isPending ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Resetting...</>
+                  ) : (
+                    <>Reset Password</>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </Layout>
