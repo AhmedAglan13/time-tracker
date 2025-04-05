@@ -367,14 +367,14 @@ export default function ReportsPage() {
         <div className="flex flex-wrap gap-2">
           {isAdmin && (
             <Select
-              value={selectedUserId?.toString() || ""}
-              onValueChange={(value) => setSelectedUserId(value ? parseInt(value) : null)}
+              value={selectedUserId?.toString() || "all"}
+              onValueChange={(value) => setSelectedUserId(value !== "all" ? parseInt(value) : null)}
             >
               <SelectTrigger className="min-w-[180px] border-primary/20 bg-primary/5">
                 <SelectValue placeholder="Select User" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Users</SelectItem>
+                <SelectItem value="all">All Users</SelectItem>
                 {allUsers.map(user => (
                   <SelectItem key={user.id} value={user.id.toString()}>
                     {user.name} ({user.role})
