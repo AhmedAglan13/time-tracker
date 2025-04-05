@@ -128,8 +128,8 @@ export default function AuthPage() {
       <div className="md:w-1/2 p-8 flex items-center justify-center bg-gradient-to-br from-background to-background/80">
         <Card className="w-full max-w-md border-2 border-primary/20 shadow-xl">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl">Welcome! 👋</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-3xl font-bold text-foreground">Welcome! 👋</CardTitle>
+            <CardDescription className="text-muted-foreground text-base">
               Sign in or create a new account
             </CardDescription>
           </CardHeader>
@@ -142,9 +142,9 @@ export default function AuthPage() {
             
             <TabsContent value="login">
               <CardContent>
-                <div className="bg-blue-100 dark:bg-blue-900/30 mb-4 p-3 rounded-md border border-blue-200 dark:border-blue-800">
-                  <p className="text-sm text-blue-800 dark:text-blue-300">
-                    <strong>Demo Account:</strong> Use <code className="bg-blue-200 dark:bg-blue-800 px-1 py-0.5 rounded">testuser</code> with password <code className="bg-blue-200 dark:bg-blue-800 px-1 py-0.5 rounded">testpass</code>
+                <div className="bg-primary/15 mb-4 p-4 rounded-md border-2 border-primary/30">
+                  <p className="text-sm text-foreground font-medium">
+                    <strong>Demo Account:</strong> Use <code className="bg-primary/25 px-1.5 py-0.5 rounded font-bold">testuser</code> with password <code className="bg-primary/25 px-1.5 py-0.5 rounded font-bold">testpass</code>
                   </p>
                 </div>
                 <Form {...loginForm}>
@@ -196,7 +196,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full font-semibold text-md rounded-lg" 
+                      className="w-full font-semibold text-base rounded-lg bg-primary hover:bg-primary-hover text-white shadow-md py-6" 
                       disabled={loginMutation.isPending}
                       onClick={() => {
                         console.log("Login form submitted with:", {
@@ -274,7 +274,7 @@ export default function AuthPage() {
                     
                     <Button 
                       type="submit" 
-                      className="w-full font-semibold text-md rounded-lg" 
+                      className="w-full font-semibold text-base rounded-lg bg-primary hover:bg-primary-hover text-white shadow-md py-6" 
                       disabled={registerMutation.isPending}
                     >
                       {registerMutation.isPending ? "Creating account..." : "Create Account"}
