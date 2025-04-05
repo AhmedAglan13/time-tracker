@@ -1,13 +1,19 @@
 import { 
   users, 
   sessions, 
-  activityLogs, 
+  activityLogs,
+  timeBlocks,
+  dailyGoals,
   type User, 
   type InsertUser, 
   type Session, 
   type InsertSession,
   type ActivityLog,
-  type InsertActivityLog
+  type InsertActivityLog,
+  type TimeBlock,
+  type InsertTimeBlock,
+  type DailyGoal,
+  type InsertDailyGoal
 } from "@shared/schema";
 import { db, pool } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -33,6 +39,22 @@ export interface IStorage {
   getActivityLog(id: number): Promise<ActivityLog | undefined>;
   getActivityLogsBySessionId(sessionId: number): Promise<ActivityLog[]>;
   createActivityLog(activityLog: InsertActivityLog): Promise<ActivityLog>;
+  
+  // Time Block methods
+  getTimeBlock(id: number): Promise<TimeBlock | undefined>;
+  getTimeBlocksByUserId(userId: number): Promise<TimeBlock[]>;
+  getTimeBlocksBySessionId(sessionId: number): Promise<TimeBlock[]>;
+  createTimeBlock(timeBlock: InsertTimeBlock): Promise<TimeBlock>;
+  updateTimeBlock(id: number, timeBlock: Partial<TimeBlock>): Promise<TimeBlock>;
+  deleteTimeBlock(id: number): Promise<void>;
+  
+  // Daily Goal methods
+  getDailyGoal(id: number): Promise<DailyGoal | undefined>;
+  getDailyGoalsByUserId(userId: number): Promise<DailyGoal[]>;
+  getDailyGoalsBySessionId(sessionId: number): Promise<DailyGoal[]>;
+  createDailyGoal(dailyGoal: InsertDailyGoal): Promise<DailyGoal>;
+  updateDailyGoal(id: number, dailyGoal: Partial<DailyGoal>): Promise<DailyGoal>;
+  deleteDailyGoal(id: number): Promise<void>;
   
   // Session store for authentication
   sessionStore: any;
@@ -146,6 +168,96 @@ export class DatabaseStorage implements IStorage {
   async createActivityLog(insertActivityLog: InsertActivityLog): Promise<ActivityLog> {
     const result = await db.insert(activityLogs).values(insertActivityLog).returning();
     return result[0];
+  }
+  
+  // Time Block methods
+  async getTimeBlock(id: number): Promise<TimeBlock | undefined> {
+    const result = await db.select().from(timeBlocks).where(eq(timeBlocks.id, id));
+    return result[0];
+  }
+  
+  async getTimeBlocksByUserId(userId: number): Promise<TimeBlock[]> {
+    return await db
+      .select()
+      .from(timeBlocks)
+      .where(eq(timeBlocks.userId, userId))
+      .orderBy(timeBlocks.startTime);
+  }
+  
+  async getTimeBlocksBySessionId(sessionId: number): Promise<TimeBlock[]> {
+    return await db
+      .select()
+      .from(timeBlocks)
+      .where(eq(timeBlocks.sessionId, sessionId))
+      .orderBy(timeBlocks.startTime);
+  }
+  
+  async createTimeBlock(insertTimeBlock: InsertTimeBlock): Promise<TimeBlock> {
+    const result = await db.insert(timeBlocks).values(insertTimeBlock).returning();
+    return result[0];
+  }
+  
+  async updateTimeBlock(id: number, timeBlockUpdate: Partial<TimeBlock>): Promise<TimeBlock> {
+    const result = await db
+      .update(timeBlocks)
+      .set(timeBlockUpdate)
+      .where(eq(timeBlocks.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Time block with id ${id} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async deleteTimeBlock(id: number): Promise<void> {
+    await db.delete(timeBlocks).where(eq(timeBlocks.id, id));
+  }
+  
+  // Daily Goal methods
+  async getDailyGoal(id: number): Promise<DailyGoal | undefined> {
+    const result = await db.select().from(dailyGoals).where(eq(dailyGoals.id, id));
+    return result[0];
+  }
+  
+  async getDailyGoalsByUserId(userId: number): Promise<DailyGoal[]> {
+    return await db
+      .select()
+      .from(dailyGoals)
+      .where(eq(dailyGoals.userId, userId))
+      .orderBy(desc(dailyGoals.createdAt));
+  }
+  
+  async getDailyGoalsBySessionId(sessionId: number): Promise<DailyGoal[]> {
+    return await db
+      .select()
+      .from(dailyGoals)
+      .where(eq(dailyGoals.sessionId, sessionId))
+      .orderBy(desc(dailyGoals.createdAt));
+  }
+  
+  async createDailyGoal(insertDailyGoal: InsertDailyGoal): Promise<DailyGoal> {
+    const result = await db.insert(dailyGoals).values(insertDailyGoal).returning();
+    return result[0];
+  }
+  
+  async updateDailyGoal(id: number, dailyGoalUpdate: Partial<DailyGoal>): Promise<DailyGoal> {
+    const result = await db
+      .update(dailyGoals)
+      .set(dailyGoalUpdate)
+      .where(eq(dailyGoals.id, id))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error(`Daily goal with id ${id} not found`);
+    }
+    
+    return result[0];
+  }
+  
+  async deleteDailyGoal(id: number): Promise<void> {
+    await db.delete(dailyGoals).where(eq(dailyGoals.id, id));
   }
 }
 

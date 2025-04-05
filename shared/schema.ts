@@ -28,6 +28,31 @@ export const activityLogs = pgTable("activity_logs", {
   type: text("type").notNull(), // "info", "warning", "error", etc.
 });
 
+// New table for time blocks
+export const timeBlocks = pgTable("time_blocks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  sessionId: integer("session_id"),
+  title: text("title").notNull(),
+  description: text("description"),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  completed: boolean("completed").default(false),
+  color: text("color").default("#4f46e5"), // Default color (indigo-600)
+});
+
+// New table for daily goals
+export const dailyGoals = pgTable("daily_goals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  sessionId: integer("session_id"),
+  title: text("title").notNull(),
+  description: text("description"),
+  completed: boolean("completed").default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  priority: integer("priority").default(0), // 0: low, 1: medium, 2: high
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -51,9 +76,33 @@ export const insertActivityLogSchema = createInsertSchema(activityLogs).pick({
   type: true,
 });
 
+export const insertTimeBlockSchema = createInsertSchema(timeBlocks).pick({
+  userId: true,
+  sessionId: true,
+  title: true,
+  description: true,
+  startTime: true,
+  endTime: true,
+  completed: true,
+  color: true,
+});
+
+export const insertDailyGoalSchema = createInsertSchema(dailyGoals).pick({
+  userId: true,
+  sessionId: true,
+  title: true,
+  description: true,
+  completed: true,
+  priority: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+export type TimeBlock = typeof timeBlocks.$inferSelect;
+export type InsertTimeBlock = z.infer<typeof insertTimeBlockSchema>;
+export type DailyGoal = typeof dailyGoals.$inferSelect;
+export type InsertDailyGoal = z.infer<typeof insertDailyGoalSchema>;
