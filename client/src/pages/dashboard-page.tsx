@@ -48,22 +48,6 @@ export default function DashboardPage() {
     return `${hours}h ${minutes}m`;
   };
   
-  // Get gradient based on time of day
-  const getTimeBasedGradient = () => {
-    switch(timePeriod) {
-      case 'morning': 
-        return 'bg-gradient-to-r from-primary/20 to-secondary/30';
-      case 'afternoon': 
-        return 'bg-gradient-to-r from-primary/30 to-secondary/40';
-      case 'evening': 
-        return 'bg-gradient-to-r from-primary/40 to-secondary/50';
-      case 'night': 
-        return 'bg-gradient-to-r from-secondary/50 to-secondary/30';
-      default: 
-        return 'fawry-gradient bg-opacity-20';
-    }
-  };
-  
   // Admin dashboard statistics
   const [adminStats, setAdminStats] = useState({
     userCount: 0,
@@ -145,73 +129,61 @@ export default function DashboardPage() {
         <>
           {/* Admin Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-primary/10' : 'bg-primary/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">Total Users</h3>
+                  <h3 className="font-medium text-sm text-card-title">Total Users</h3>
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <Users className="h-4 w-4 text-primary" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">{adminStats.userCount}</div>
-                <div className="text-xs text-white opacity-80 mt-1">
+                <div className="text-2xl font-bold text-card-text">{adminStats.userCount}</div>
+                <div className="text-xs text-card-text mt-1">
                   All registered users
                 </div>
               </CardContent>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-indigo-400/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-indigo-400/10' : 'bg-indigo-400/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">Active Users</h3>
+                  <h3 className="font-medium text-sm text-card-title">Active Users</h3>
                   <div className="h-8 w-8 rounded-full bg-indigo-400/10 flex items-center justify-center">
                     <Users className="h-4 w-4 text-indigo-400" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">{adminStats.activeUsers}</div>
-                <div className="text-xs text-white opacity-80 mt-1">
+                <div className="text-2xl font-bold text-card-text">{adminStats.activeUsers}</div>
+                <div className="text-xs text-card-text mt-1">
                   Currently active
                 </div>
               </CardContent>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-amber-500/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-amber-500/10' : 'bg-amber-500/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">Total Sessions</h3>
+                  <h3 className="font-medium text-sm text-card-title">Total Sessions</h3>
                   <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
                     <Calendar className="h-4 w-4 text-amber-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">{adminStats.sessionCount}</div>
-                <div className="text-xs text-white opacity-80 mt-1">
+                <div className="text-2xl font-bold text-card-text">{adminStats.sessionCount}</div>
+                <div className="text-xs text-card-text mt-1">
                   Completed sessions
                 </div>
               </CardContent>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-green-500/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-green-500/10' : 'bg-green-500/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">Total Time</h3>
+                  <h3 className="font-medium text-sm text-card-title">Total Time</h3>
                   <div className="h-8 w-8 rounded-full bg-green-500/10 flex items-center justify-center">
                     <Clock className="h-4 w-4 text-green-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">{adminStats.totalTrackedTime}</div>
-                <div className="text-xs text-white opacity-80 mt-1">
+                <div className="text-2xl font-bold text-card-text">{adminStats.totalTrackedTime}</div>
+                <div className="text-xs text-card-text mt-1">
                   All user activity
                 </div>
               </CardContent>
@@ -221,20 +193,14 @@ export default function DashboardPage() {
           {/* Admin Quick Access */}
           <h2 className="text-xl font-bold mb-4 text-white">Admin Tools</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
-              timePeriod === 'night' ? 'hover:bg-primary/5' : ''
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/admin">
                 <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-                  <div className={cn(
-                    "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
-                    timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
-                  )}>
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-white">User Management</CardTitle>
-                  <p className="text-sm text-white opacity-80 flex-grow mb-4">
+                  <CardTitle className="mb-2 text-card-title">User Management</CardTitle>
+                  <p className="text-sm text-card-text flex-grow mb-4">
                     Manage users, view sessions, and monitor team productivity.
                   </p>
                   <div className="text-primary flex items-center text-sm font-medium">
@@ -244,20 +210,14 @@ export default function DashboardPage() {
               </Link>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
-              timePeriod === 'night' ? 'hover:bg-primary/5' : ''
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/reports">
                 <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-                  <div className={cn(
-                    "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
-                    timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
-                  )}>
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <BarChart className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-white">Analytics</CardTitle>
-                  <p className="text-sm text-white opacity-80 flex-grow mb-4">
+                  <CardTitle className="mb-2 text-card-title">Analytics</CardTitle>
+                  <p className="text-sm text-card-text flex-grow mb-4">
                     View organization-wide analytics and generate reports.
                   </p>
                   <div className="text-primary flex items-center text-sm font-medium">
@@ -267,20 +227,14 @@ export default function DashboardPage() {
               </Link>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
-              timePeriod === 'night' ? 'hover:bg-primary/5' : ''
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/settings">
                 <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-                  <div className={cn(
-                    "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
-                    timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
-                  )}>
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <Download className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-white">Export Data</CardTitle>
-                  <p className="text-sm text-white opacity-80 flex-grow mb-4">
+                  <CardTitle className="mb-2 text-card-title">Export Data</CardTitle>
+                  <p className="text-sm text-card-text flex-grow mb-4">
                     Export organization data for reports and integration with other systems.
                   </p>
                   <div className="text-primary flex items-center text-sm font-medium">
@@ -295,59 +249,50 @@ export default function DashboardPage() {
         <>
           {/* Regular User Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-primary/10' : 'bg-primary/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">Current Session</h3>
+                  <h3 className="font-medium text-sm text-card-title">Current Session</h3>
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <Clock className="h-4 w-4 text-primary" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-2xl font-bold text-card-text">
                   {isActive ? formatDuration(activeSeconds) : 'Not tracking'}
                 </div>
                 {isActive && (
-                  <div className="text-xs text-white opacity-80 mt-1">
+                  <div className="text-xs text-card-text mt-1">
                     Started at {new Date(currentSession?.startTime || '').toLocaleTimeString()}
                   </div>
                 )}
               </CardContent>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-indigo-400/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-indigo-400/10' : 'bg-indigo-400/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">This Week</h3>
+                  <h3 className="font-medium text-sm text-card-title">This Week</h3>
                   <div className="h-8 w-8 rounded-full bg-indigo-400/10 flex items-center justify-center">
                     <Calendar className="h-4 w-4 text-indigo-400" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">12h 45m</div>
-                <div className="text-xs text-white opacity-80 mt-1">
+                <div className="text-2xl font-bold text-card-text">12h 45m</div>
+                <div className="text-xs text-card-text mt-1">
                   8 sessions total
                 </div>
               </CardContent>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-amber-500/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300",
-              timePeriod === 'night' ? 'bg-amber-500/10' : 'bg-amber-500/5'
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-white">Average Daily</h3>
+                  <h3 className="font-medium text-sm text-card-title">Average Daily</h3>
                   <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
                     <BarChart className="h-4 w-4 text-amber-500" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-white">4h 15m</div>
-                <div className="text-xs text-white opacity-80 mt-1">
+                <div className="text-2xl font-bold text-card-text">4h 15m</div>
+                <div className="text-xs text-card-text mt-1">
                   +12% from last week
                 </div>
               </CardContent>
@@ -357,20 +302,14 @@ export default function DashboardPage() {
           {/* Regular User Feature Cards */}
           <h2 className="text-xl font-bold mb-4 text-white">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
-              timePeriod === 'night' ? 'hover:bg-primary/5' : ''
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/tracker">
                 <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-                  <div className={cn(
-                    "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
-                    timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
-                  )}>
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <Clock className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-white">Time Tracker</CardTitle>
-                  <p className="text-sm text-white opacity-80 flex-grow mb-4">
+                  <CardTitle className="mb-2 text-card-title">Time Tracker</CardTitle>
+                  <p className="text-sm text-card-text flex-grow mb-4">
                     Track your work sessions and monitor your productivity in real-time.
                   </p>
                   <div className="text-primary flex items-center text-sm font-medium">
@@ -380,20 +319,14 @@ export default function DashboardPage() {
               </Link>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
-              timePeriod === 'night' ? 'hover:bg-primary/5' : ''
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/history">
                 <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-                  <div className={cn(
-                    "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
-                    timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
-                  )}>
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <History className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-white">Session History</CardTitle>
-                  <p className="text-sm text-white opacity-80 flex-grow mb-4">
+                  <CardTitle className="mb-2 text-card-title">Session History</CardTitle>
+                  <p className="text-sm text-card-text flex-grow mb-4">
                     View your past work sessions and analyze your work patterns.
                   </p>
                   <div className="text-primary flex items-center text-sm font-medium">
@@ -403,20 +336,14 @@ export default function DashboardPage() {
               </Link>
             </Card>
             
-            <Card className={cn(
-              "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
-              timePeriod === 'night' ? 'hover:bg-primary/5' : ''
-            )}>
+            <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/settings">
                 <CardContent className="p-6 flex flex-col cursor-pointer h-full">
-                  <div className={cn(
-                    "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
-                    timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
-                  )}>
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <Settings className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-white">Preferences</CardTitle>
-                  <p className="text-sm text-white opacity-80 flex-grow mb-4">
+                  <CardTitle className="mb-2 text-card-title">Preferences</CardTitle>
+                  <p className="text-sm text-card-text flex-grow mb-4">
                     Customize your tracking settings and notification preferences.
                   </p>
                   <div className="text-primary flex items-center text-sm font-medium">
