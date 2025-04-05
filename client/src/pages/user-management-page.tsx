@@ -1,20 +1,58 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Clock, Shield, UserIcon } from "lucide-react";
+import { 
+  Loader2, Clock, Shield, UserIcon, 
+  UserPlus, Trash2, UserCheck, UserX, Edit, MoreHorizontal 
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import type { User, Session } from "@shared/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "@/components/ui/dialog";
+import { 
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
+  DropdownMenuTrigger, DropdownMenuSeparator 
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+
+// Form schemas
+const createUserSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  role: z.enum(["user", "admin"] as const)
+});
+
+// Define role type
+type UserRole = "user" | "admin";
+
+const updateRoleSchema = z.object({
+  role: z.enum(["user", "admin"] as const)
+});
+
+type CreateUserFormValues = z.infer<typeof createUserSchema>;
+type UpdateRoleFormValues = z.infer<typeof updateRoleSchema>;
 
 export default function UserManagementPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedUserSessions, setSelectedUserSessions] = useState<Session[]>([]);
   const [showSessions, setShowSessions] = useState(false);
+  const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
+  const [showUpdateRoleDialog, setShowUpdateRoleDialog] = useState(false);
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(null);
   
   const {
     data: users,
@@ -32,6 +70,131 @@ export default function UserManagementPage() {
     const secs = seconds % 60;
     
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Create user form
+  const createUserForm = useForm<CreateUserFormValues>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      name: "",
+      role: "user"
+    }
+  });
+
+  // Update role form
+  const updateRoleForm = useForm<UpdateRoleFormValues>({
+    resolver: zodResolver(updateRoleSchema),
+    defaultValues: {
+      role: "user"
+    }
+  });
+
+  // Create user mutation
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: CreateUserFormValues) => {
+      const res = await apiRequest("POST", "/api/admin/users", userData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setShowCreateUserDialog(false);
+      createUserForm.reset();
+      toast({
+        title: "Success",
+        description: "User created successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating user",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Update user role mutation
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: number; role: UserRole }) => {
+      const res = await apiRequest("PATCH", `/api/admin/users/${userId}`, { role });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setShowUpdateRoleDialog(false);
+      updateRoleForm.reset();
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating role",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const res = await apiRequest("DELETE", `/api/admin/users/${userId}`);
+      return res.ok;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setShowDeleteConfirmDialog(false);
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error deleting user",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Create user handler
+  const onCreateUserSubmit = (data: CreateUserFormValues) => {
+    createUserMutation.mutate(data);
+  };
+
+  // Update role handler
+  const onUpdateRoleSubmit = (data: UpdateRoleFormValues) => {
+    if (selectedUserId) {
+      updateRoleMutation.mutate({ userId: selectedUserId, role: data.role });
+    }
+  };
+
+  // Delete user handler
+  const onDeleteUser = () => {
+    if (selectedUserId) {
+      deleteUserMutation.mutate(selectedUserId);
+    }
+  };
+
+  // Open update role dialog
+  const openUpdateRoleDialog = (userId: number, currentRole: string) => {
+    setSelectedUserId(userId);
+    // Ensure currentRole is one of the valid roles before setting it
+    const validRole: UserRole = currentRole.toLowerCase() === "admin" ? "admin" : "user";
+    setSelectedUserRole(validRole);
+    updateRoleForm.setValue("role", validRole);
+    setShowUpdateRoleDialog(true);
+  };
+
+  // Open delete confirmation dialog
+  const openDeleteConfirmDialog = (userId: number) => {
+    setSelectedUserId(userId);
+    setShowDeleteConfirmDialog(true);
   };
 
   // Get user sessions
@@ -91,7 +254,17 @@ export default function UserManagementPage() {
 
   return (
     <Layout title="User Management">
-      <h2 className="text-2xl font-bold mb-4">User Management</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">User Management</h2>
+        <Button 
+          onClick={() => setShowCreateUserDialog(true)}
+          className="bg-primary"
+        >
+          <UserPlus className="h-4 w-4 mr-2" />
+          Add User
+        </Button>
+      </div>
+    
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -106,18 +279,18 @@ export default function UserManagementPage() {
             </TableHeader>
             <TableBody>
               {users && users.length > 0 ? (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.username}</TableCell>
-                    <TableCell>{user.name}</TableCell>
+                users.map((userData) => (
+                  <TableRow key={userData.id}>
+                    <TableCell>{userData.id}</TableCell>
+                    <TableCell>{userData.username}</TableCell>
+                    <TableCell>{userData.name}</TableCell>
                     <TableCell>
                       <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                        user.role?.toLowerCase() === "admin" 
+                        userData.role?.toLowerCase() === "admin" 
                           ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
                           : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
                       }`}>
-                        {user.role || "user"}
+                        {userData.role || "user"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -125,22 +298,39 @@ export default function UserManagementPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-28"
-                          onClick={() => user.id && getUserSessions(user.id)}
+                          onClick={() => userData.id && getUserSessions(userData.id)}
                         >
                           <Clock className="h-3.5 w-3.5 mr-1" />
                           Sessions
                         </Button>
-                        <Button
-                          variant={user.role?.toLowerCase() === "admin" ? "destructive" : "secondary"}
-                          size="sm"
-                          className="w-28"
-                        >
-                          {user.role?.toLowerCase() === "admin" 
-                            ? <><Shield className="h-3.5 w-3.5 mr-1" />Admin</>
-                            : <><UserIcon className="h-3.5 w-3.5 mr-1" />Regular</>
-                          }
-                        </Button>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontal className="h-3.5 w-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => userData.id && userData.role && 
+                                openUpdateRoleDialog(userData.id, userData.role)
+                              }
+                            >
+                              <Edit className="h-3.5 w-3.5 mr-2" />
+                              Change Role
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              className="text-red-600 focus:text-red-600"
+                              onClick={() => userData.id && 
+                                openDeleteConfirmDialog(userData.id)
+                              }
+                            >
+                              <Trash2 className="h-3.5 w-3.5 mr-2" />
+                              Delete User
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -207,6 +397,192 @@ export default function UserManagementPage() {
           <DialogClose asChild>
             <Button variant="outline" className="mt-4">Close</Button>
           </DialogClose>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Create User Dialog */}
+      <Dialog open={showCreateUserDialog} onOpenChange={setShowCreateUserDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Add a new user to the Time Tracker application.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...createUserForm}>
+            <form onSubmit={createUserForm.handleSubmit(onCreateUserSubmit)} className="space-y-4">
+              <FormField
+                control={createUserForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createUserForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createUserForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createUserForm.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="user">Regular User</SelectItem>
+                          <SelectItem value="admin">Administrator</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button 
+                  type="submit" 
+                  disabled={createUserMutation.isPending}
+                  className="w-full mt-4"
+                >
+                  {createUserMutation.isPending ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...</>
+                  ) : (
+                    <>Create User</>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Update Role Dialog */}
+      <Dialog open={showUpdateRoleDialog} onOpenChange={setShowUpdateRoleDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              Update the role for this user account.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...updateRoleForm}>
+            <form onSubmit={updateRoleForm.handleSubmit(onUpdateRoleSubmit)} className="space-y-4">
+              <FormField
+                control={updateRoleForm.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="user">Regular User</SelectItem>
+                        <SelectItem value="admin">Administrator</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button 
+                  type="submit" 
+                  disabled={updateRoleMutation.isPending}
+                  className="w-full mt-4"
+                >
+                  {updateRoleMutation.isPending ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...</>
+                  ) : (
+                    <>Update Role</>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this user? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDeleteConfirmDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={onDeleteUser}
+              disabled={deleteUserMutation.isPending}
+            >
+              {deleteUserMutation.isPending ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Deleting...</>
+              ) : (
+                <>Delete</>
+              )}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </Layout>
