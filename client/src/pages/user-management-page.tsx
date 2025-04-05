@@ -5,9 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Clock, Shield, UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { User, Session } from "@shared/schema";
+import type { User, Session } from "@shared/schema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 
 export default function UserManagementPage() {
@@ -121,13 +121,27 @@ export default function UserManagementPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => user.id && getUserSessions(user.id)}
-                      >
-                        View Sessions
-                      </Button>
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-28"
+                          onClick={() => user.id && getUserSessions(user.id)}
+                        >
+                          <Clock className="h-3.5 w-3.5 mr-1" />
+                          Sessions
+                        </Button>
+                        <Button
+                          variant={user.role?.toLowerCase() === "admin" ? "destructive" : "secondary"}
+                          size="sm"
+                          className="w-28"
+                        >
+                          {user.role?.toLowerCase() === "admin" 
+                            ? <><Shield className="h-3.5 w-3.5 mr-1" />Admin</>
+                            : <><UserIcon className="h-3.5 w-3.5 mr-1" />Regular</>
+                          }
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
