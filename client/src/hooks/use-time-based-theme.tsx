@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // Define time periods and their corresponding color schemes
-type TimePeriod = 'morning' | 'afternoon' | 'evening' | 'night';
+export type TimePeriod = 'morning' | 'afternoon' | 'evening' | 'night';
 
 interface ColorScheme {
   primary: string;
@@ -13,7 +13,7 @@ interface ColorScheme {
 }
 
 // Color schemes for different times of day
-const colorSchemes: Record<TimePeriod, ColorScheme> = {
+export const colorSchemes: Record<TimePeriod, ColorScheme> = {
   morning: {
     primary: 'hsla(271, 81%, 56%, 1)', // Vibrant purple (default)
     secondary: 'hsla(43, 96%, 58%, 1)', // Warm yellow
@@ -48,8 +48,22 @@ const colorSchemes: Record<TimePeriod, ColorScheme> = {
   }
 };
 
+// Storage key for test mode
+const TEST_MODE_KEY = 'time_tracker_test_mode';
+const TEST_PERIOD_KEY = 'time_tracker_test_period';
+
 // Function to determine current time period
 function getCurrentTimePeriod(): TimePeriod {
+  // Check if test mode is enabled
+  const testMode = localStorage.getItem(TEST_MODE_KEY) === 'true';
+  if (testMode) {
+    const testPeriod = localStorage.getItem(TEST_PERIOD_KEY) as TimePeriod | null;
+    if (testPeriod && Object.keys(colorSchemes).includes(testPeriod)) {
+      return testPeriod as TimePeriod;
+    }
+  }
+  
+  // Real time-based logic
   const hour = new Date().getHours();
   
   if (hour >= 5 && hour < 12) {
@@ -66,9 +80,12 @@ function getCurrentTimePeriod(): TimePeriod {
 export function useTimeBasedTheme() {
   const [currentPeriod, setCurrentPeriod] = useState<TimePeriod>(getCurrentTimePeriod());
   const [scheme, setScheme] = useState<ColorScheme>(colorSchemes[currentPeriod]);
+  const [testMode, setTestMode] = useState<boolean>(localStorage.getItem(TEST_MODE_KEY) === 'true');
   
-  // Update time period and scheme every minute
+  // Update time period and scheme when not in test mode
   useEffect(() => {
+    if (testMode) return; // Don't run interval in test mode
+    
     const interval = setInterval(() => {
       const newPeriod = getCurrentTimePeriod();
       if (newPeriod !== currentPeriod) {
@@ -78,13 +95,37 @@ export function useTimeBasedTheme() {
     }, 60000); // Check every minute
     
     return () => clearInterval(interval);
-  }, [currentPeriod]);
+  }, [currentPeriod, testMode]);
+  
+  // Function to manually set the time period (for testing)
+  const setTimePeriod = (period: TimePeriod) => {
+    setCurrentPeriod(period);
+    setScheme(colorSchemes[period]);
+    localStorage.setItem(TEST_PERIOD_KEY, period);
+  };
+  
+  // Toggle test mode
+  const toggleTestMode = () => {
+    const newTestMode = !testMode;
+    setTestMode(newTestMode);
+    localStorage.setItem(TEST_MODE_KEY, newTestMode.toString());
+    
+    if (!newTestMode) {
+      // Revert to real time if leaving test mode
+      const realPeriod = getCurrentTimePeriod();
+      setCurrentPeriod(realPeriod);
+      setScheme(colorSchemes[realPeriod]);
+    }
+  };
   
   // Return current time period, theme data and helper functions
   return {
     timePeriod: currentPeriod,
     colorScheme: scheme,
     colorSchemes,
+    testMode,
+    toggleTestMode,
+    setTimePeriod,
     getGreeting: () => {
       switch(currentPeriod) {
         case 'morning': return 'Good morning';

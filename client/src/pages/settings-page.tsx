@@ -7,8 +7,9 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
-import { SaveIcon, AlertCircle, UserIcon, BellIcon, KeyIcon, MonitorIcon } from "lucide-react";
+import { SaveIcon, AlertCircle, UserIcon, BellIcon, KeyIcon, MonitorIcon, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { TimeThemeTester } from "@/components/time-theme-tester";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -184,6 +185,9 @@ export default function SettingsPage() {
           
           {/* Appearance Tab */}
           <TabsContent value="appearance">
+            {/* Time Theme Tester */}
+            <TimeThemeTester />
+            
             <Card>
               <CardHeader>
                 <CardTitle>Appearance Settings</CardTitle>
