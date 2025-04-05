@@ -29,10 +29,28 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, loginMutation, registerMutation, isLoading, error } = useAuth();
+  
+  // Add debug logging
+  useEffect(() => {
+    console.log("Auth context state:", { user, isLoading, error });
+    
+    if (error) {
+      console.error("Auth error:", error);
+    }
+    
+    if (loginMutation.isError) {
+      console.error("Login error:", loginMutation.error);
+    }
+    
+    if (registerMutation.isError) {
+      console.error("Register error:", registerMutation.error);
+    }
+  }, [user, isLoading, error, loginMutation.isError, registerMutation.isError]);
   
   // If user is already logged in, redirect to dashboard
   if (user) {
+    console.log("User is logged in, redirecting to dashboard:", user);
     return <Redirect to="/" />;
   }
   
@@ -40,8 +58,8 @@ export default function AuthPage() {
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: "testuser",
+      password: "testpass",
     },
   });
   
@@ -124,6 +142,11 @@ export default function AuthPage() {
             
             <TabsContent value="login">
               <CardContent>
+                <div className="bg-blue-100 dark:bg-blue-900/30 mb-4 p-3 rounded-md border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-300">
+                    <strong>Demo Account:</strong> Use <code className="bg-blue-200 dark:bg-blue-800 px-1 py-0.5 rounded">testuser</code> with password <code className="bg-blue-200 dark:bg-blue-800 px-1 py-0.5 rounded">testpass</code>
+                  </p>
+                </div>
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <FormField
@@ -133,7 +156,15 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Username</FormLabel>
                           <FormControl>
-                            <Input placeholder="username" className="border-primary/20" {...field} />
+                            <Input 
+                              placeholder="username" 
+                              className="border-primary/20" 
+                              {...field} 
+                              onChange={(e) => {
+                                field.onChange(e);
+                                console.log("Username field changed:", e.target.value);
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -147,7 +178,16 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" className="border-primary/20" {...field} />
+                            <Input 
+                              type="password" 
+                              placeholder="••••••••" 
+                              className="border-primary/20" 
+                              {...field} 
+                              onChange={(e) => {
+                                field.onChange(e);
+                                console.log("Password field changed:", e.target.value.replace(/./g, '*'));
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -158,6 +198,12 @@ export default function AuthPage() {
                       type="submit" 
                       className="w-full font-semibold text-md rounded-lg" 
                       disabled={loginMutation.isPending}
+                      onClick={() => {
+                        console.log("Login form submitted with:", {
+                          username: loginForm.getValues().username,
+                          password: loginForm.getValues().password.replace(/./g, '*')
+                        });
+                      }}
                     >
                       {loginMutation.isPending ? "Signing in..." : "Sign In"}
                     </Button>

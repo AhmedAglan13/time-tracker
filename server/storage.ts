@@ -53,18 +53,47 @@ export class DatabaseStorage implements IStorage {
   
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.id, id));
-    return result[0];
+    console.log(`Getting user by id: ${id}`);
+    try {
+      const result = await db.select().from(users).where(eq(users.id, id));
+      if (result.length > 0) {
+        console.log(`Found user with id ${id}: ${result[0].username}`);
+      } else {
+        console.log(`No user found with id: ${id}`);
+      }
+      return result[0];
+    } catch (error) {
+      console.error(`Error getting user by id ${id}:`, error);
+      throw error;
+    }
   }
   
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.username, username));
-    return result[0];
+    console.log(`Getting user by username: ${username}`);
+    try {
+      const result = await db.select().from(users).where(eq(users.username, username));
+      if (result.length > 0) {
+        console.log(`Found user with username ${username}`);
+      } else {
+        console.log(`No user found with username: ${username}`);
+      }
+      return result[0];
+    } catch (error) {
+      console.error(`Error getting user by username ${username}:`, error);
+      throw error;
+    }
   }
   
   async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await db.insert(users).values(insertUser).returning();
-    return result[0];
+    console.log(`Creating new user: ${insertUser.username}`);
+    try {
+      const result = await db.insert(users).values(insertUser).returning();
+      console.log(`User created: ${result[0].username} with id: ${result[0].id}`);
+      return result[0];
+    } catch (error) {
+      console.error(`Error creating user ${insertUser.username}:`, error);
+      throw error;
+    }
   }
   
   // Session methods
