@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "Welcome back!",
-        description: `You are now signed in as ${user.name}`,
+        // Removed description for cleaner notification
       });
     },
     onError: (error: Error) => {
@@ -60,8 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
       toast({
-        title: "Registration successful",
-        description: `Welcome, ${user.name}!`,
+        title: "Account created",
+        // Removed description for cleaner notification
       });
     },
     onError: (error: Error) => {
@@ -79,10 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      });
+      // Removed toast notification for logout success
     },
     onError: (error: Error) => {
       toast({
