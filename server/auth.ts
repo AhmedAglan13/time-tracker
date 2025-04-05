@@ -79,24 +79,37 @@ async function testPasswordFunctions() {
 
 // Create a test account with known credentials for testing
 async function createTestAccount() {
-  console.log("Creating test account...");
+  console.log("Creating test accounts...");
   try {
-    const existingUser = await storage.getUserByUsername("testuser");
-    if (existingUser) {
-      console.log("Test account already exists");
-      return;
+    // Create admin account
+    const existingAdmin = await storage.getUserByUsername("testuser");
+    if (!existingAdmin) {
+      const adminUser = await storage.createUser({
+        username: "testuser",
+        password: await hashPassword("testpass"),
+        name: "Test Admin",
+        role: "admin"
+      });
+      console.log("Admin account created:", adminUser.username);
+    } else {
+      console.log("Admin account already exists");
     }
     
-    const user = await storage.createUser({
-      username: "testuser",
-      password: await hashPassword("testpass"),
-      name: "Test User",
-      role: "admin"
-    });
-    
-    console.log("Test account created:", user.username);
+    // Create normal user account
+    const existingNormalUser = await storage.getUserByUsername("normaluser");
+    if (!existingNormalUser) {
+      const normalUser = await storage.createUser({
+        username: "normaluser",
+        password: await hashPassword("userpass"),
+        name: "Regular User",
+        role: "user"
+      });
+      console.log("Normal user account created:", normalUser.username);
+    } else {
+      console.log("Normal user account already exists");
+    }
   } catch (error) {
-    console.error("Error creating test account:", error);
+    console.error("Error creating test accounts:", error);
   }
 }
 
