@@ -7,6 +7,7 @@ import { AuthProvider } from "./hooks/use-auth";
 import { SessionProvider } from "./hooks/use-session";
 import { TimeThemeProvider } from "./components/time-theme-provider";
 import { ProtectedRoute } from "./lib/protected-route";
+import { RoleProtectedRoute } from "./lib/role-protected-route";
 import DashboardPage from "./pages/dashboard-page";
 import TrackerPage from "./pages/tracker-page";
 import AuthPage from "./pages/auth-page";
@@ -19,11 +20,13 @@ function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={DashboardPage} />
-      <ProtectedRoute path="/tracker" component={TrackerPage} />
-      <ProtectedRoute path="/history" component={HistoryPage} />
-      <ProtectedRoute path="/reports" component={ReportsPage} />
+      {/* Time tracking features only available to regular users */}
+      <RoleProtectedRoute path="/tracker" component={TrackerPage} allowedRole="user" />
+      <RoleProtectedRoute path="/history" component={HistoryPage} allowedRole="user" />
+      <RoleProtectedRoute path="/reports" component={ReportsPage} allowedRole="both" />
       <ProtectedRoute path="/settings" component={SettingsPage} />
-      <ProtectedRoute path="/admin" component={AdminDashboard} />
+      {/* Admin dashboard only available to admin users */}
+      <RoleProtectedRoute path="/admin" component={AdminDashboard} allowedRole="admin" />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

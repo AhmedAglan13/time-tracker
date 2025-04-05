@@ -40,8 +40,8 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       .substring(0, 2);
   };
   
-  // Define default links for all users
-  const defaultLinks = [
+  // Define regular user links - these users need time tracking functionality
+  const userLinks = [
     { id: "dashboard", href: "/", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
     { id: "tracker", href: "/tracker", label: "Time Tracker", icon: <Clock className="w-5 h-5 mr-3" /> },
     { id: "history", href: "/history", label: "History", icon: <History className="w-5 h-5 mr-3" /> },
@@ -49,15 +49,17 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
     { id: "settings", href: "/settings", label: "Settings", icon: <Settings className="w-5 h-5 mr-3" /> }
   ];
   
-  // Define admin-only links
+  // Define admin-only links - admins focus on user management, not time tracking
   const adminLinks = [
-    { id: "admin", href: "/admin", label: "Admin Dashboard", icon: <Shield className="w-5 h-5 mr-3" /> }
+    { id: "dashboard", href: "/", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
+    { id: "admin", href: "/admin", label: "Admin Dashboard", icon: <Shield className="w-5 h-5 mr-3" /> },
+    { id: "users", href: "/admin", label: "User Management", icon: <Users className="w-5 h-5 mr-3" /> },
+    { id: "reports", href: "/reports", label: "Analytics", icon: <BarChart className="w-5 h-5 mr-3" /> },
+    { id: "settings", href: "/settings", label: "Settings", icon: <Settings className="w-5 h-5 mr-3" /> }
   ];
   
-  // Combine links based on user role
-  const links = user?.role?.toLowerCase() === 'admin' 
-    ? [...defaultLinks, ...adminLinks]
-    : defaultLinks;
+  // Use different navigation based on user role
+  const links = user?.role?.toLowerCase() === 'admin' ? adminLinks : userLinks;
   
   const sidebarClasses = cn(
     "flex flex-col h-screen bg-muted/50 border-r border-border transition-all duration-300",
