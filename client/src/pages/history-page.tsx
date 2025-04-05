@@ -5,7 +5,16 @@ import { useSession } from "@/hooks/use-session";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, ArrowDownAZ, History, Clock } from "lucide-react";
+import { 
+  Search, 
+  Calendar, 
+  ArrowDownAZ, 
+  History, 
+  Clock, 
+  Download,
+  FileSpreadsheet,
+  FileJson
+} from "lucide-react";
 import { format, addDays, isAfter, isBefore, startOfDay, subDays, subWeeks, subMonths, startOfWeek, startOfMonth } from "date-fns";
 import { useState, useEffect } from "react";
 import { Session } from "@shared/schema";
@@ -14,6 +23,12 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type TimePeriod = 'today' | 'week' | 'month' | 'all';
 
@@ -25,6 +40,100 @@ export default function HistoryPage() {
   const [sortByDuration, setSortByDuration] = useState(false);
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
   const [activeTimePeriod, setActiveTimePeriod] = useState<TimePeriod>('all');
+  
+  // Function to export sessions data as CSV
+  const exportSessionsCSV = () => {
+    if (filteredSessions.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no sessions matching your current filters.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Define CSV headers
+    const headers = ["ID", "Start Time", "End Time", "Duration (minutes)", "Active Duration (minutes)", "Status"];
+    
+    // Convert sessions to CSV rows
+    const csvData = filteredSessions.map(session => {
+      const startTime = new Date(session.startTime).toLocaleString();
+      const endTime = session.endTime ? new Date(session.endTime).toLocaleString() : "Ongoing";
+      const duration = session.endTime ? 
+        Math.floor((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000) : 
+        "Ongoing";
+      const activeDuration = session.activeDuration ? Math.floor(session.activeDuration / 60) : 0;
+      const status = session.endTime ? "Completed" : "In Progress";
+      
+      return [
+        session.id,
+        startTime,
+        endTime,
+        duration,
+        activeDuration,
+        status
+      ].join(",");
+    });
+    
+    // Combine headers and data
+    const csvContent = [headers.join(","), ...csvData].join("\n");
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `session_history_${format(new Date(), "yyyy-MM-dd")}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Export Successful",
+      description: `${filteredSessions.length} sessions exported as CSV.`
+    });
+  };
+  
+  // Function to export sessions data as JSON
+  const exportSessionsJSON = () => {
+    if (filteredSessions.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no sessions matching your current filters.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Format the data for better readability
+    const jsonData = filteredSessions.map(session => {
+      return {
+        id: session.id,
+        userId: session.userId,
+        startTime: new Date(session.startTime).toISOString(),
+        endTime: session.endTime ? new Date(session.endTime).toISOString() : null,
+        activeDuration: session.activeDuration,
+        status: session.endTime ? "Completed" : "In Progress"
+      };
+    });
+    
+    // Create download link
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `session_history_${format(new Date(), "yyyy-MM-dd")}.json`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Export Successful",
+      description: `${filteredSessions.length} sessions exported as JSON.`
+    });
+  };
   
   // Function to handle time period filter
   const handleTimePeriodFilter = (period: TimePeriod) => {
@@ -164,6 +273,25 @@ export default function HistoryPage() {
             >
               <ArrowDownAZ className="h-4 w-4 text-primary/80" />
             </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="border-primary/20 hover:bg-primary/10">
+                  <Download className="h-4 w-4 mr-2 text-primary/80" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={exportSessionsCSV} className="cursor-pointer">
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  <span>Export as CSV</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={exportSessionsJSON} className="cursor-pointer">
+                  <FileJson className="h-4 w-4 mr-2" />
+                  <span>Export as JSON</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <Button onClick={handleApplyFilters}>
               Apply Filters
