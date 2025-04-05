@@ -13,16 +13,12 @@ import AuthPage from "./pages/auth-page";
 import HistoryPage from "./pages/history-page";
 import ReportsPage from "./pages/reports-page";
 import SettingsPage from "./pages/settings-page";
-import TimeBlocksPage from "./pages/time-blocks-page";
-import DailyGoalsPage from "./pages/daily-goals-page";
 
 function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={DashboardPage} />
       <ProtectedRoute path="/tracker" component={TrackerPage} />
-      <ProtectedRoute path="/time-blocks" component={TimeBlocksPage} />
-      <ProtectedRoute path="/daily-goals" component={DailyGoalsPage} />
       <ProtectedRoute path="/history" component={HistoryPage} />
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
