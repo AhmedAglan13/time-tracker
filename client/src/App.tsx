@@ -15,6 +15,7 @@ import HistoryPage from "./pages/history-page";
 import ReportsPage from "./pages/reports-page";
 import SettingsPage from "./pages/settings-page";
 import AdminDashboard from "./pages/admin-dashboard";
+import UserManagementPage from "./pages/user-management-page";
 
 function Router() {
   return (
@@ -25,8 +26,9 @@ function Router() {
       <RoleProtectedRoute path="/history" component={HistoryPage} allowedRole="user" />
       <RoleProtectedRoute path="/reports" component={ReportsPage} allowedRole="both" />
       <ProtectedRoute path="/settings" component={SettingsPage} />
-      {/* Admin dashboard only available to admin users */}
+      {/* Admin-specific pages */}
       <RoleProtectedRoute path="/admin" component={AdminDashboard} allowedRole="admin" />
+      <RoleProtectedRoute path="/user-management" component={UserManagementPage} allowedRole="admin" />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

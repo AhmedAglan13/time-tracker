@@ -1,32 +1,17 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
-import { Loader2, UserPlus, X } from "lucide-react";
+import { Link } from "wouter";
+import { Loader2, Users, BarChart, Download } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { Separator } from "@/components/ui/separator";
-import { User, Session } from "@shared/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { useTimeTheme } from "@/components/time-theme-provider";
+import { cn } from "@/lib/utils";
 
 export default function AdminDashboard() {
-  const { toast } = useToast();
   const { user } = useAuth();
-  const [selectedUserSessions, setSelectedUserSessions] = useState<Session[]>([]);
-  const [showSessions, setShowSessions] = useState(false);
+  const { timePeriod } = useTimeTheme();
   
-  const {
-    data: users,
-    isLoading: usersLoading,
-    error: usersError
-  } = useQuery<User[]>({
-    queryKey: ["/api/admin/users"],
-    enabled: user?.role?.toLowerCase() === "admin",
-  });
-
   const {
     data: analytics,
     isLoading: analyticsLoading,
@@ -50,24 +35,6 @@ export default function AdminDashboard() {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Get user sessions
-  const getUserSessions = async (userId: number): Promise<void> => {
-    try {
-      const response = await fetch(`/api/admin/users/${userId}/sessions`);
-      if (!response.ok) throw new Error("Failed to fetch user sessions");
-      
-      const sessions = await response.json();
-      setSelectedUserSessions(sessions);
-      setShowSessions(true);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch user sessions",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (user?.role?.toLowerCase() !== "admin") {
     return (
       <Layout title="Admin Access Denied">
@@ -81,7 +48,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (usersLoading || analyticsLoading) {
+  if (analyticsLoading) {
     return (
       <Layout title="Admin Dashboard">
         <div className="flex justify-center items-center h-[60vh]">
@@ -91,13 +58,13 @@ export default function AdminDashboard() {
     );
   }
 
-  if (usersError || analyticsError) {
+  if (analyticsError) {
     return (
       <Layout title="Admin Dashboard">
         <div className="flex flex-col items-center justify-center h-[70vh]">
           <h2 className="text-2xl font-bold mb-4">Error Loading Admin Data</h2>
           <p className="text-muted-foreground mb-8">
-            {(usersError as Error)?.message || (analyticsError as Error)?.message || "An unknown error occurred"}
+            {(analyticsError as Error)?.message || "An unknown error occurred"}
           </p>
           <Button onClick={() => window.location.reload()}>Retry</Button>
         </div>
@@ -107,13 +74,20 @@ export default function AdminDashboard() {
 
   return (
     <Layout title="Admin Dashboard">
+      {/* Statistics Overview */}
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{analytics?.userCount || 0}</div>
+          <CardContent className="flex items-center">
+            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-primary/10">
+              <Users className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <div className="text-3xl font-bold">{analytics?.userCount || 0}</div>
+              <p className="text-xs text-muted-foreground">Registered users</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -121,8 +95,14 @@ export default function AdminDashboard() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Sessions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{analytics?.sessionCount || 0}</div>
+          <CardContent className="flex items-center">
+            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-indigo-500/10">
+              <BarChart className="h-6 w-6 text-indigo-500" />
+            </div>
+            <div>
+              <div className="text-3xl font-bold">{analytics?.sessionCount || 0}</div>
+              <p className="text-xs text-muted-foreground">Completed sessions</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -130,8 +110,14 @@ export default function AdminDashboard() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Users</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{analytics?.activeUsers || 0}</div>
+          <CardContent className="flex items-center">
+            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-green-500/10">
+              <Users className="h-6 w-6 text-green-500" />
+            </div>
+            <div>
+              <div className="text-3xl font-bold">{analytics?.activeUsers || 0}</div>
+              <p className="text-xs text-muted-foreground">Currently working</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -139,118 +125,92 @@ export default function AdminDashboard() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Active Time</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {analytics ? formatDuration(analytics.totalActiveTime) : "00:00:00"}
+          <CardContent className="flex items-center">
+            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-amber-500/10">
+              <Loader2 className="h-6 w-6 text-amber-500" />
+            </div>
+            <div>
+              <div className="text-3xl font-bold">
+                {analytics ? formatDuration(analytics.totalActiveTime) : "00:00:00"}
+              </div>
+              <p className="text-xs text-muted-foreground">Total active time</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <h2 className="text-2xl font-bold mb-4">User Management</h2>
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users && users.length > 0 ? (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.username}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                        user.role?.toLowerCase() === "admin" 
-                          ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                      }`}>
-                        {user.role || "user"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => user.id && getUserSessions(user.id)}
-                      >
-                        View Sessions
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-6">
-                    No users found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-      
-      {/* Session Dialog */}
-      <Dialog open={showSessions} onOpenChange={setShowSessions}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>User Sessions</DialogTitle>
-            <DialogDescription>
-              Viewing all tracked time sessions for this user
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="max-h-[60vh] overflow-y-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Start Time</TableHead>
-                  <TableHead>End Time</TableHead>
-                  <TableHead>Active Duration</TableHead>
-                  <TableHead>Total Duration</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedUserSessions.length > 0 ? (
-                  selectedUserSessions.map((session) => (
-                    <TableRow key={session.id}>
-                      <TableCell>{session.id}</TableCell>
-                      <TableCell>{new Date(session.startTime).toLocaleString()}</TableCell>
-                      <TableCell>
-                        {session.endTime 
-                          ? new Date(session.endTime).toLocaleString() 
-                          : "Active"}
-                      </TableCell>
-                      <TableCell>{formatDuration(session.activeDuration || 0)}</TableCell>
-                      <TableCell>{formatDuration(session.totalDuration || 0)}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-4">
-                      No sessions found for this user
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          
-          <DialogClose asChild>
-            <Button variant="outline" className="mt-4">Close</Button>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
+      {/* Administrative Actions */}
+      <h2 className="text-2xl font-bold mb-4">Administrative Actions</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
+          <Link href="/user-management">
+            <CardContent className="p-6 flex flex-col cursor-pointer h-full">
+              <div className={cn(
+                "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
+                timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
+              )}>
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="mb-2">User Management</CardTitle>
+              <p className="text-sm text-muted-foreground flex-grow mb-4">
+                View all users, manage accounts, and monitor individual user sessions.
+              </p>
+              <div className="text-primary flex items-center text-sm font-medium">
+                Manage Users
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
+          <Link href="/reports">
+            <CardContent className="p-6 flex flex-col cursor-pointer h-full">
+              <div className={cn(
+                "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
+                timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
+              )}>
+                <BarChart className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="mb-2">Analytics</CardTitle>
+              <p className="text-sm text-muted-foreground flex-grow mb-4">
+                View detailed analytics and reports on user productivity and time usage.
+              </p>
+              <div className="text-primary flex items-center text-sm font-medium">
+                View Reports
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className={cn(
+          "border-2 border-primary/20 shadow-md rounded-xl hover:shadow-lg transition-all duration-300 hover:border-primary/40",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
+          <Link href="/settings">
+            <CardContent className="p-6 flex flex-col cursor-pointer h-full">
+              <div className={cn(
+                "mb-4 h-12 w-12 rounded-full flex items-center justify-center",
+                timePeriod === 'night' ? 'bg-primary/20' : 'bg-primary/10'
+              )}>
+                <Download className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="mb-2">Export Data</CardTitle>
+              <p className="text-sm text-muted-foreground flex-grow mb-4">
+                Export organization data for reports and integration with other systems.
+              </p>
+              <div className="text-primary flex items-center text-sm font-medium">
+                Export Reports
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+      </div>
     </Layout>
   );
 }
