@@ -9,9 +9,9 @@
   --secondary-hover: #0A5E96;
   --accent: #6366F1;     /* Indigo */
   --muted: #1F2937;      /* Dark Gray */
-  --muted-foreground: #9CA3AF;
+  --muted-foreground: #D1D5DB; /* Light Gray for better contrast */
   --background: #121212; /* Almost Black */
-  --foreground: #F9FAFB; /* White */
+  --foreground: #FFFFFF; /* Pure White for maximum contrast */
   --card: #1A1A1A;       /* Dark Gray for cards */
   --card-hover: #222222;
 }

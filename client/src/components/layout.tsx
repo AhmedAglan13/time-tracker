@@ -20,24 +20,24 @@ export function Layout({ children, title = "Dashboard" }: LayoutProps) {
       
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="bg-primary/5 border-b border-primary/10 h-16 flex items-center justify-between px-4">
+        <header className="bg-background border-b border-border/20 h-16 flex items-center justify-between px-4 shadow-sm">
           <div className="flex items-center">
             {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="icon"
-              className="mr-4 md:hidden text-secondary hover:text-primary hover:bg-primary/10"
+              className="mr-4 md:hidden text-primary hover:text-primary hover:bg-primary/10"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
               aria-label="Menu"
             >
               <Menu className="h-6 w-6" />
             </Button>
-            <h2 className="text-lg font-medium text-secondary">{title}</h2>
+            <h2 className="text-xl font-medium text-foreground">{title}</h2>
           </div>
         </header>
         
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gradient-to-b from-background to-background/95">
           {children}
         </main>
       </div>

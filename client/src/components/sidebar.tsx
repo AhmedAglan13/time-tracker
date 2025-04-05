@@ -62,7 +62,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const links = user?.role?.toLowerCase() === 'admin' ? adminLinks : userLinks;
   
   const sidebarClasses = cn(
-    "flex flex-col h-screen bg-[#044C7E] border-r border-border transition-all duration-300 text-white",
+    "flex flex-col h-screen bg-secondary shadow-xl border-r border-border/30 transition-all duration-300 text-white",
     isMobileOpen ? "fixed inset-y-0 left-0 z-50 w-64" : "hidden md:flex w-64"
   );
   
@@ -101,10 +101,10 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
                 <Link href={link.href}>
                   <div
                     className={cn(
-                      "flex items-center p-2 rounded-md transition-colors cursor-pointer",
+                      "flex items-center p-3 rounded-md transition-all duration-200 cursor-pointer font-medium",
                       isActive 
-                        ? "bg-primary/90 text-white font-medium" 
-                        : "text-white hover:bg-primary/50"
+                        ? "bg-primary text-white shadow-md" 
+                        : "text-white hover:bg-white/10 hover:pl-4"
                     )}
                     onClick={() => {
                       if (isMobileOpen) onCloseMobile();
@@ -123,8 +123,8 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       {/* Footer */}
       <div className="p-4 mt-auto">
         <Button 
-          variant="outline" 
-          className="w-full justify-start text-white border-white/20 hover:bg-primary/50 hover:text-white" 
+          variant="ghost" 
+          className="w-full justify-start text-white border border-white/10 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200" 
           onClick={handleLogout}
         >
           <LogOut className="w-4 h-4 mr-2" />
