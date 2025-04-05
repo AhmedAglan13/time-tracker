@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import { AuthProvider } from "./hooks/use-auth";
 import { SessionProvider } from "./hooks/use-session";
 import { TimeThemeProvider } from "./components/time-theme-provider";
+import { HelpProvider } from "./hooks/use-help-content";
 import { ProtectedRoute } from "./lib/protected-route";
 import { RoleProtectedRoute } from "./lib/role-protected-route";
 import DashboardPage from "./pages/dashboard-page";
@@ -41,8 +42,10 @@ function App() {
       <AuthProvider>
         <SessionProvider>
           <TimeThemeProvider>
-            <Router />
-            <Toaster />
+            <HelpProvider>
+              <Router />
+              <Toaster />
+            </HelpProvider>
           </TimeThemeProvider>
         </SessionProvider>
       </AuthProvider>

@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { useAuth } from "@/hooks/use-auth";
 import { useTimeTheme } from "@/components/time-theme-provider";
+import { useHelpContent } from "@/hooks/use-help-content";
+import { HelpBubble } from "@/components/help-bubble";
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,6 +27,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { currentSession, activeSeconds, isActive } = useSession();
   const { getGreeting, timePeriod, colorScheme, getPeriodIcon } = useTimeTheme();
+  const { getHelpContent } = useHelpContent();
   
   // Helper function to format a date
   const formatDate = (date: Date): string => {
@@ -90,14 +93,22 @@ export default function DashboardPage() {
       {/* Welcome Banner */}
       <div className="dashboard-greeting mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div>
-            <h1 className="greeting-text mb-2 text-card-title font-semibold text-xl">
-              {getGreeting()}, {user?.username || 'User'}! {getPeriodIcon()}
-            </h1>
-            <p className="timestamp-text text-card-text">
-              Today is {formatDate(new Date())}
-              {isAdmin && <span className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-semibold">Admin</span>}
-            </p>
+          <div className="flex items-start">
+            <div>
+              <h1 className="greeting-text mb-2 text-card-title font-semibold text-xl">
+                {getGreeting()}, {user?.username || 'User'}! {getPeriodIcon()}
+              </h1>
+              <p className="timestamp-text text-card-text">
+                Today is {formatDate(new Date())}
+                {isAdmin && <span className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-semibold">Admin</span>}
+              </p>
+            </div>
+            <HelpBubble 
+              content={getHelpContent('dashboard-overview')?.content} 
+              title={getHelpContent('dashboard-overview')?.title}
+              position="right"
+              className="ml-2 mt-1"
+            />
           </div>
           <div className="mt-4 md:mt-0">
             {!isAdmin && isActive ? (
@@ -191,7 +202,15 @@ export default function DashboardPage() {
           </div>
           
           {/* Admin Quick Access */}
-          <h2 className="text-xl font-bold mb-4 text-card-title">Admin Tools</h2>
+          <div className="flex items-center mb-4">
+            <h2 className="text-xl font-bold text-card-title">Admin Tools</h2>
+            <HelpBubble 
+              content={getHelpContent('admin-overview')?.content} 
+              title={getHelpContent('admin-overview')?.title}
+              position="right"
+              className="ml-2"
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/admin">
@@ -216,7 +235,15 @@ export default function DashboardPage() {
                   <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <BarChart className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-card-title">Analytics</CardTitle>
+                  <div className="flex items-center mb-2">
+                    <CardTitle className="text-card-title">Analytics</CardTitle>
+                    <HelpBubble 
+                      content={getHelpContent('analytics-usage')?.content} 
+                      title={getHelpContent('analytics-usage')?.title}
+                      position="top"
+                      className="ml-1.5"
+                    />
+                  </div>
                   <p className="text-sm text-card-text flex-grow mb-4">
                     View organization-wide analytics and generate reports.
                   </p>
@@ -252,7 +279,15 @@ export default function DashboardPage() {
             <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-sm text-card-title">Current Session</h3>
+                  <div className="flex items-center">
+                    <h3 className="font-medium text-sm text-card-title">Current Session</h3>
+                    <HelpBubble 
+                      content={getHelpContent('current-session')?.content} 
+                      title={getHelpContent('current-session')?.title}
+                      position="top"
+                      className="ml-1.5"
+                    />
+                  </div>
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <Clock className="h-4 w-4 text-primary" />
                   </div>
@@ -300,7 +335,15 @@ export default function DashboardPage() {
           </div>
           
           {/* Regular User Feature Cards */}
-          <h2 className="text-xl font-bold mb-4 text-card-title">Quick Access</h2>
+          <div className="flex items-center mb-4">
+            <h2 className="text-xl font-bold text-card-title">Quick Access</h2>
+            <HelpBubble 
+              content={getHelpContent('dashboard-overview')?.content} 
+              title={getHelpContent('dashboard-overview')?.title}
+              position="right"
+              className="ml-2"
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/tracker">
@@ -325,7 +368,15 @@ export default function DashboardPage() {
                   <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <History className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="mb-2 text-card-title">Session History</CardTitle>
+                  <div className="flex items-center mb-2">
+                    <CardTitle className="text-card-title">Session History</CardTitle>
+                    <HelpBubble 
+                      content={getHelpContent('history-filters')?.content} 
+                      title={getHelpContent('history-filters')?.title}
+                      position="top"
+                      className="ml-1.5"
+                    />
+                  </div>
                   <p className="text-sm text-card-text flex-grow mb-4">
                     View your past work sessions and analyze your work patterns.
                   </p>
