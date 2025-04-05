@@ -46,13 +46,7 @@ export default function AuthPage() {
     if (registerMutation.isError) {
       console.error("Register error:", registerMutation.error);
     }
-  }, [user, isLoading, error, loginMutation.isError, registerMutation.isError]);
-  
-  // If user is already logged in, redirect to dashboard
-  if (user) {
-    console.log("User is logged in, redirecting to dashboard:", user);
-    return <Redirect to="/" />;
-  }
+  }, [user, isLoading, error, loginMutation.isError, registerMutation.isError, loginMutation.error, registerMutation.error]);
   
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -83,6 +77,12 @@ export default function AuthPage() {
   const onRegisterSubmit = (data: RegisterFormValues) => {
     registerMutation.mutate(data);
   };
+
+  // Redirect to dashboard if user is logged in
+  if (user) {
+    console.log("User is logged in, redirecting to dashboard:", user);
+    return <Redirect to="/" />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
