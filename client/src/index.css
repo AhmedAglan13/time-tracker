@@ -5,15 +5,24 @@
 :root {
   --primary: #FF6243;    /* Coral/Orange */
   --primary-hover: #FF7E65;
+  --primary-foreground: #FFFFFF;
   --secondary: #044C7E;  /* Deep Blue */
   --secondary-hover: #0A5E96;
+  --secondary-foreground: #FFFFFF;
   --accent: #6366F1;     /* Indigo */
+  --accent-foreground: #FFFFFF;
   --muted: #1F2937;      /* Dark Gray */
-  --muted-foreground: #D1D5DB; /* Light Gray for better contrast */
+  --muted-foreground: #FFFFFF; /* Changed to white for better contrast */
   --background: #121212; /* Almost Black */
   --foreground: #FFFFFF; /* Pure White for maximum contrast */
   --card: #1A1A1A;       /* Dark Gray for cards */
   --card-hover: #222222;
+  --card-foreground: #FFFFFF;
+  --border: #333333;
+  --input: #333333;
+  --destructive: #FF4040;
+  --destructive-foreground: #FFFFFF;
+  --ring: var(--primary);
 }
 
 @layer base {
@@ -26,11 +35,33 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
+    @apply font-bold tracking-tight text-white;
+  }
+  
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl;
   }
   
   .card-gradient {
     background: linear-gradient(120deg, var(--secondary) 0%, var(--secondary-hover) 100%);
+  }
+  
+  /* Improved text for greetings */
+  .greeting-text {
+    @apply text-white font-bold text-2xl md:text-3xl;
+  }
+  
+  /* Improved text for timestamp */
+  .timestamp-text {
+    @apply text-white opacity-90 text-sm md:text-base;
   }
 }
 
@@ -54,19 +85,47 @@
     border-color: var(--secondary);
   }
   
+  .to-secondary-hover {
+    --tw-gradient-to: var(--secondary-hover);
+  }
+  
   .btn-fawry {
-    @apply bg-primary text-white hover:bg-primary-hover transition-colors;
+    @apply bg-primary text-white hover:bg-primary-hover font-semibold px-6 py-3 text-base rounded-md transition-colors;
   }
   
   .btn-secondary {
-    @apply bg-secondary text-white hover:bg-secondary-hover transition-colors;
+    @apply bg-secondary text-white hover:bg-secondary-hover font-semibold px-6 py-3 text-base rounded-md transition-colors;
   }
   
   .card-fawry {
     @apply border-primary/20 bg-card shadow-lg hover:shadow-xl transition-all duration-300;
   }
   
+  .card-title {
+    @apply text-xl font-bold text-white mb-2;
+  }
+  
+  .card-subtitle {
+    @apply text-base font-medium text-white/90 mb-4;
+  }
+  
+  .card-value {
+    @apply text-3xl font-bold text-primary mb-1;
+  }
+  
+  .card-label {
+    @apply text-sm font-medium text-white/80;
+  }
+  
   .fawry-gradient {
     @apply bg-gradient-to-r from-primary to-secondary;
+  }
+  
+  .dashboard-stat {
+    @apply p-6 rounded-xl bg-card border border-border flex flex-col;
+  }
+  
+  .dashboard-greeting {
+    @apply p-6 rounded-xl bg-gradient-to-br from-secondary to-primary text-white mb-6;
   }
 }
