@@ -76,66 +76,86 @@ export default function AdminDashboard() {
     <Layout title="Admin Dashboard">
       {/* Statistics Overview */}
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center">
-            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-primary/10">
-              <Users className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{analytics?.userCount || 0}</div>
-              <p className="text-xs text-muted-foreground">Registered users</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sessions</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center">
-            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-indigo-500/10">
-              <BarChart className="h-6 w-6 text-indigo-500" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{analytics?.sessionCount || 0}</div>
-              <p className="text-xs text-muted-foreground">Completed sessions</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Users</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center">
-            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-green-500/10">
-              <Users className="h-6 w-6 text-green-500" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{analytics?.activeUsers || 0}</div>
-              <p className="text-xs text-muted-foreground">Currently working</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Active Time</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center">
-            <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-amber-500/10">
-              <Loader2 className="h-6 w-6 text-amber-500" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold">
-                {analytics ? formatDuration(analytics.totalActiveTime) : "00:00:00"}
+        <Card className={cn(
+          "cursor-pointer hover:shadow-md transition-all border-2 border-primary/10 hover:border-primary/30",
+          timePeriod === 'night' ? 'hover:bg-primary/5' : ''
+        )}>
+          <Link href="/user-management">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center">
+              <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-primary/10">
+                <Users className="h-6 w-6 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground">Total active time</p>
-            </div>
-          </CardContent>
+              <div>
+                <div className="text-3xl font-bold">{analytics?.userCount || 0}</div>
+                <p className="text-xs text-muted-foreground">All registered users</p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className={cn(
+          "cursor-pointer hover:shadow-md transition-all border-2 border-indigo-500/10 hover:border-indigo-500/30",
+          timePeriod === 'night' ? 'hover:bg-indigo-500/5' : ''
+        )}>
+          <Link href="/history">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Sessions</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center">
+              <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-indigo-500/10">
+                <BarChart className="h-6 w-6 text-indigo-500" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold">{analytics?.sessionCount || 0}</div>
+                <p className="text-xs text-muted-foreground">Completed sessions</p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className={cn(
+          "cursor-pointer hover:shadow-md transition-all border-2 border-green-500/10 hover:border-green-500/30",
+          timePeriod === 'night' ? 'hover:bg-green-500/5' : ''
+        )}>
+          <Link href="/user-management">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Active Users</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center">
+              <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-green-500/10">
+                <Users className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold">{analytics?.activeUsers || 0}</div>
+                <p className="text-xs text-muted-foreground">Currently active</p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className={cn(
+          "cursor-pointer hover:shadow-md transition-all border-2 border-amber-500/10 hover:border-amber-500/30",
+          timePeriod === 'night' ? 'hover:bg-amber-500/5' : ''
+        )}>
+          <Link href="/reports">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Active Time</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center">
+              <div className="mr-4 w-12 h-12 rounded-full flex items-center justify-center bg-amber-500/10">
+                <Loader2 className="h-6 w-6 text-amber-500" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold">
+                  {analytics ? formatDuration(analytics.totalActiveTime) : "00:00:00"}
+                </div>
+                <p className="text-xs text-muted-foreground">Total active time</p>
+              </div>
+            </CardContent>
+          </Link>
         </Card>
       </div>
 
