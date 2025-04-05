@@ -91,10 +91,10 @@ export default function DashboardPage() {
       <div className="dashboard-greeting mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div>
-            <h1 className="greeting-text mb-2">
+            <h1 className="greeting-text mb-2 text-card-title font-semibold text-xl">
               {getGreeting()}, {user?.username || 'User'}! {getPeriodIcon()}
             </h1>
-            <p className="timestamp-text">
+            <p className="timestamp-text text-card-text">
               Today is {formatDate(new Date())}
               {isAdmin && <span className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-semibold">Admin</span>}
             </p>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Admin Quick Access */}
-          <h2 className="text-xl font-bold mb-4 text-white">Admin Tools</h2>
+          <h2 className="text-xl font-bold mb-4 text-card-title">Admin Tools</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/admin">
@@ -300,7 +300,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Regular User Feature Cards */}
-          <h2 className="text-xl font-bold mb-4 text-white">Quick Access</h2>
+          <h2 className="text-xl font-bold mb-4 text-card-title">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border border-border shadow-md rounded-xl hover:shadow-lg transition-all duration-300 bg-card">
               <Link href="/tracker">

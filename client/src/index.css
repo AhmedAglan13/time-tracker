@@ -136,6 +136,6 @@
   }
   
   .dashboard-greeting {
-    @apply p-6 rounded-xl bg-gradient-to-br from-secondary to-primary text-white mb-6;
+    @apply p-6 rounded-xl bg-card border border-border shadow-md mb-6;
   }
 }
