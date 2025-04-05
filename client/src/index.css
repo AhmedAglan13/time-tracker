@@ -3,28 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --primary: #FF6243;    /* Coral/Orange */
-  --primary-hover: #FF7E65;
+  --primary: #3B82F6;    /* Bright Blue */
+  --primary-hover: #2563EB;
   --primary-foreground: #FFFFFF;
-  --secondary: #044C7E;  /* Deep Blue */
-  --secondary-hover: #0A5E96;
+  --secondary: #1E40AF;  /* Deep Blue */
+  --secondary-hover: #1E3A8A;
   --secondary-foreground: #FFFFFF;
   --accent: #6366F1;     /* Indigo */
   --accent-foreground: #FFFFFF;
-  --muted: #1F2937;      /* Dark Gray */
-  --muted-foreground: #FFFFFF; /* Changed to white for better contrast */
-  --background: #121212; /* Almost Black */
-  --foreground: #FFFFFF; /* Pure White for maximum contrast */
+  --muted: #F3F4F6;      /* Light Gray */
+  --muted-foreground: #4B5563; /* Dark Gray for text */
+  --background: #FFFFFF; /* White */
+  --foreground: #1F2937; /* Dark Gray for maximum contrast */
   --card: #FFFFFF;       /* White for cards */
-  --card-hover: #F5F5F5;
-  --card-foreground: #333333; /* Dark text for cards */
+  --card-hover: #F9FAFB;
+  --card-foreground: #111827; /* Very dark gray text for cards */
   --border: #E5E7EB;
-  --input: #F3F4F6;
-  --destructive: #FF4040;
+  --input: #F9FAFB;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
   --ring: var(--primary);
-  --card-text: #333333;  /* Dark text for cards */
-  --card-title: #044C7E; /* Blue for titles */
+  --card-text: #374151;  /* Dark text for cards */
+  --card-title: #1E40AF; /* Blue for titles */
 }
 
 @layer base {
@@ -37,7 +37,7 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight text-white;
+    @apply font-bold tracking-tight text-gray-800;
   }
   
   h1 {
@@ -53,17 +53,17 @@
   }
   
   .card-gradient {
-    background: linear-gradient(120deg, var(--secondary) 0%, var(--secondary-hover) 100%);
+    background: linear-gradient(120deg, var(--primary) 0%, var(--secondary) 100%);
   }
   
   /* Improved text for greetings */
   .greeting-text {
-    @apply text-white font-bold text-2xl md:text-3xl;
+    @apply text-gray-800 font-bold text-2xl md:text-3xl;
   }
   
   /* Improved text for timestamp */
   .timestamp-text {
-    @apply text-white opacity-90 text-sm md:text-base;
+    @apply text-gray-600 text-sm md:text-base;
   }
 }
 
@@ -91,7 +91,7 @@
     --tw-gradient-to: var(--secondary-hover);
   }
   
-  .btn-fawry {
+  .btn-primary {
     @apply bg-primary text-white hover:bg-primary-hover font-semibold px-6 py-3 text-base rounded-md transition-colors;
   }
   
@@ -99,8 +99,12 @@
     @apply bg-secondary text-white hover:bg-secondary-hover font-semibold px-6 py-3 text-base rounded-md transition-colors;
   }
   
-  .card-fawry {
-    @apply border-primary/20 bg-card shadow-lg hover:shadow-xl transition-all duration-300;
+  .btn-outline {
+    @apply border-2 border-primary/30 bg-white text-primary hover:bg-blue-50 font-semibold px-6 py-3 text-base rounded-md transition-colors;
+  }
+  
+  .card-standard {
+    @apply border border-blue-200 bg-card shadow-md hover:shadow-lg transition-all duration-300 rounded-xl;
   }
   
   .card-title {
@@ -127,15 +131,23 @@
     color: var(--card-text);
   }
   
-  .fawry-gradient {
-    @apply bg-gradient-to-r from-primary to-secondary;
+  .blue-gradient {
+    @apply bg-gradient-to-r from-blue-500 to-blue-700;
   }
   
   .dashboard-stat {
-    @apply p-6 rounded-xl bg-card border border-border flex flex-col;
+    @apply p-6 rounded-xl bg-white border border-blue-100 shadow-md flex flex-col;
   }
   
   .dashboard-greeting {
-    @apply p-6 rounded-xl bg-card border border-border shadow-md mb-6;
+    @apply p-6 rounded-xl bg-white border border-blue-100 shadow-md mb-6;
+  }
+  
+  .dashboard-card {
+    @apply border border-blue-100 bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-xl p-6;
+  }
+  
+  .stats-card {
+    @apply border border-blue-100 bg-white shadow-sm hover:shadow-md transition-all duration-300 rounded-xl p-5;
   }
 }

@@ -62,30 +62,30 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const links = user?.role?.toLowerCase() === 'admin' ? adminLinks : userLinks;
   
   const sidebarClasses = cn(
-    "flex flex-col h-screen bg-secondary shadow-xl border-r border-border/30 transition-all duration-300 text-white",
+    "flex flex-col h-screen bg-white shadow-lg border-r border-blue-200 transition-all duration-300",
     isMobileOpen ? "fixed inset-y-0 left-0 z-50 w-64" : "hidden md:flex w-64"
   );
   
   return (
     <aside className={sidebarClasses}>
-      <div className="p-5 border-b border-white/10">
+      <div className="p-5 border-b border-blue-100">
         <div className="flex items-center space-x-3">
-          <div className="text-primary text-xl">
+          <div className="text-blue-600 text-xl">
             <Clock className="h-6 w-6 animate-pulse" />
           </div>
-          <h1 className="text-xl font-bold text-white">Time <span className="text-primary font-extrabold">Tracker</span></h1>
+          <h1 className="text-xl font-bold text-gray-800">Time <span className="text-blue-600 font-extrabold">Tracker</span></h1>
         </div>
       </div>
       
       {/* User Profile */}
-      <div className="p-5 border-b border-white/10">
+      <div className="p-5 border-b border-blue-100">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
             {getInitials(user?.username || "")}
           </div>
           <div>
-            <h3 className="font-medium text-white">{user?.username || "User"}</h3>
-            <p className="text-xs text-white/70">DevOps Engineer</p>
+            <h3 className="font-medium text-gray-800">{user?.username || "User"}</h3>
+            <p className="text-xs text-gray-500">DevOps Engineer</p>
           </div>
         </div>
       </div>
@@ -103,8 +103,8 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
                     className={cn(
                       "flex items-center p-3 rounded-md transition-all duration-200 cursor-pointer font-medium",
                       isActive 
-                        ? "bg-primary text-white shadow-md" 
-                        : "text-white hover:bg-white/10 hover:pl-4"
+                        ? "bg-blue-600 text-white shadow-md" 
+                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-700 hover:pl-4"
                     )}
                     onClick={() => {
                       if (isMobileOpen) onCloseMobile();
@@ -123,17 +123,17 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       {/* Footer */}
       <div className="p-4 mt-auto">
         <Button 
-          variant="ghost" 
-          className="w-full justify-start text-white border border-white/10 hover:bg-primary hover:border-primary hover:text-white transition-all duration-200" 
+          variant="outline" 
+          className="w-full justify-start text-gray-700 border border-blue-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-200" 
           onClick={handleLogout}
         >
           <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </Button>
         
-        <Separator className="my-4 bg-white/20" />
+        <Separator className="my-4 bg-blue-100" />
         
-        <div className="flex items-center justify-between text-xs text-white/60">
+        <div className="flex items-center justify-between text-xs text-gray-500">
           <span>Version 1.1.0</span>
           <span>© {new Date().getFullYear()}</span>
         </div>
