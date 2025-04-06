@@ -7,9 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
-import { SaveIcon, AlertCircle, UserIcon, BellIcon, KeyIcon, MonitorIcon, Clock } from "lucide-react";
+import { SaveIcon, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { TimeThemeTester } from "@/components/time-theme-tester";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -36,11 +35,10 @@ export default function SettingsPage() {
         </div>
         
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full md:w-auto grid-cols-3 md:grid-cols-4">
+          <TabsList className="grid w-full md:w-auto grid-cols-3">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
           </TabsList>
           
           {/* Profile Tab */}
@@ -178,57 +176,6 @@ export default function SettingsPage() {
                 <Button onClick={handleSaveSettings}>
                   <SaveIcon className="mr-2 h-4 w-4" />
                   Update Password
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          {/* Appearance Tab */}
-          <TabsContent value="appearance">
-            {/* Time Theme Tester */}
-            <TimeThemeTester />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Appearance Settings</CardTitle>
-                <CardDescription>
-                  Customize the look and feel of the application.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Theme Mode</Label>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" className="flex-1">Light</Button>
-                    <Button variant="outline" className="flex-1">Dark</Button>
-                    <Button variant="outline" className="flex-1">System</Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Primary Color</Label>
-                  <div className="grid grid-cols-4 gap-2">
-                    <Button variant="outline" className="p-2 h-10 w-10 rounded-full bg-blue-500"></Button>
-                    <Button variant="outline" className="p-2 h-10 w-10 rounded-full bg-green-500"></Button>
-                    <Button variant="outline" className="p-2 h-10 w-10 rounded-full bg-purple-500"></Button>
-                    <Button variant="outline" className="p-2 h-10 w-10 rounded-full bg-orange-500"></Button>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between space-x-2">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="reduce-animations">Reduce Animations</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Use minimal animations for a more subtle interface
-                    </p>
-                  </div>
-                  <Switch id="reduce-animations" />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={handleSaveSettings}>
-                  <SaveIcon className="mr-2 h-4 w-4" />
-                  Save Changes
                 </Button>
               </CardFooter>
             </Card>
