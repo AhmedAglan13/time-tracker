@@ -72,8 +72,7 @@ export const dailyGoals = pgTable("daily_goals", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
-  name: true,
-  role: true
+  name: true
 });
 
 export const insertSessionSchema = createInsertSchema(sessions).pick({

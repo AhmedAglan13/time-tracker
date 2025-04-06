@@ -22,7 +22,6 @@ const registerSchema = z.object({
   name: z.string().min(1, "Full name is required"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.string().optional(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -64,7 +63,6 @@ export default function AuthPage() {
       name: "",
       username: "",
       password: "",
-      role: "DevOps Engineer",
     },
   });
   
@@ -252,20 +250,6 @@ export default function AuthPage() {
                           <FormLabel className="text-gray-700 font-medium">Password</FormLabel>
                           <FormControl>
                             <Input type="password" placeholder="••••••••" className="border-gray-300 focus:border-blue-500 bg-white text-gray-800" {...field} />
-                          </FormControl>
-                          <FormMessage className="text-red-500" />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={registerForm.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 font-medium">Role (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="DevOps Engineer" className="border-gray-300 focus:border-blue-500 bg-white text-gray-800" {...field} />
                           </FormControl>
                           <FormMessage className="text-red-500" />
                         </FormItem>

@@ -202,6 +202,7 @@ export function setupAuth(app: Express) {
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
+        role: "user", // Set default role to 'user'
       });
 
       req.login(user, (err) => {
