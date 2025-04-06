@@ -124,7 +124,11 @@ export default function DashboardPage() {
                 </Link>
               </Button>
             ) : (
-              <Button asChild>
+              <Button 
+                asChild 
+                className="bg-[#0F172A] text-white hover:bg-[#1E293B]"
+                variant="secondary"
+              >
                 <Link href="/admin">
                   <Shield className="mr-2 h-4 w-4" />
                   Admin Dashboard
